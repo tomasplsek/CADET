@@ -36,7 +36,8 @@
         <a href="https://tomasplsek.github.io/CADET/">CADET</a> is a machine learning pipeline trained for identification of 
         surface brightness depressions (so-called <em>X-ray cavities</em>) on noisy <em>Chandra</em> images of early-type 
         galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained for producing pixel-wise 
-        cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities.
+        cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities. 
+        The pipeline is further described in <a targer="_blank" href="https://arxiv.org/abs/2304.05457">Plšek et al. 2023</a>.
     </p>
 
     <p>
@@ -110,6 +111,14 @@ estimating their areas and volumes.
 <br>
 
 <img src="figures/netron_full.png" title="Network architecture" style="width: 100%;">
+
+<p style="font-size: 92%;">
+  Figure: The schematic picture of the convolutional neural network composed of 5 Inception-like blocks. Each block 
+  consists of a series of parallel convolutional layers each composed of various numbers of convolutional 
+  filters with various sizes. The output of all parallel convolutional layers is then concatenated into a 
+  single output, followed by a convolutional layer with 32 of 1x1 filters and a dropout layer, 
+  which was for simplicity omitted. The scheme was created using the <a target="_blank" href="https://netron.app/">Netron</a> visualisation tool.
+</p.>
 
 <br class="longbr">
 
