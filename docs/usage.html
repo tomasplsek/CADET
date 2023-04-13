@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- <script src="https://gist.github.com/username/a39a422ebdff6e732753b90573100b16.js"></script> -->
+<title>CADET</title>
+<link rel="icon" href="figures/CADET.png">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+
+<body>
+<link rel="stylesheet" href="styles.css">
+<!-- <link rel="stylesheet" href="prism.css"> -->
+
+<a href="https://github.com/tomasplsek/CADET"><img src="figures/github.png" style="position: relative; width: 100px; left: 0%; top: 17px; float: right; margin-right: 0px;"></a>
+
+<header><em>Cavity Detection Tool</em>  (CADET)</header>
+
+<img src="figures/CADET.png" style="float: right; width: 290px; padding-right: 120px; position: fixed; left: 78%; top: 21%;">
+
+<div class="sidenav">
+<a id="menu" href="index.html">Overview</a>
+<a id="menu" href="training.html">Training</a>
+<a style="color: rgb(20, 97, 179);font-weight: bold;" id="menu" href="usage.html">Usage</a>
+<a id="menu" href="results.html">Results</a>
+</div>
+
+<main>
+
+<section>
+
+<h1>Usage</h1>
+
+<p>
+The <b><em>CADET</em></b> pipeline inputs either raw <em>Chandra</em> images in units of counts 
+(numbers of captured photons) or normalized background-subtracted and/or exposure-corrected images. 
+When using e.g. corrected flux images, images should be normalized by the lowest pixel value so all 
+pixels are higher than or equal to 1. For images with many point sources, they should be filled 
+with surrounding background level using Poisson statistics 
+(<a target="_blank" href="https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html">dmfilth</a>
+within <a target="_blank" href="https://cxc.harvard.edu/ciao/">CIAO</a>).
+
+<br class="longbr">
+
+Convolutional part of the <b><em>CADET</em></b> pipeline can only input 128x128 images. As a part 
+of the pipeline, input images are therefore being cropped to a size specified by parameter scale 
+(size = scale * 128 pixels) and re-binned to 128x128 images. By default, images are probed on 4 
+different scales (1,2,3,4). The size of the image inputted into the pipeline therefore needs to 
+at least 512x512 pixels (minimal input size differs if non-default scales are used) and images 
+should be centred at the centre of the galaxy. The re-binning is performed using <em>Astropy</em> and 
+<em>Numpy</em> libraries and can only handle integer binsizes. For floating point number binning, we 
+recommend using <a target="_blank" href="https://cxc.cfa.harvard.edu/ciao/ahelp/dmregrid.html">dmregrid</a> 
+and applying <b><em>CADET</em></b> model manually (see Convolutional part).
+
+<br class="longbr">
+
+Before being decomposed by the DBSCAN algorithm, pixel-wise predictions produced by the convolutional 
+part of the <b><em>CADET</em></b> pipeline need to be further thresholded. In order to simultaneously 
+calibrate the volume error and false positive rate, we introduced two discrimination thresholds (for 
+more info see <a target="_blank" href="">Plšek et al. 2023</a> and their default values are 0.4 and 
+0.65, respectively. Nevertheless, both discrimination thresholds are changeable and can be set to an 
+arbitrary value between 0 and 1.
+
+<br class="longbr">
+
+The <b><em>CADET</em></b> pipeline is composed as a self-standing Python script (<code>CADET.py</code>), which can 
+be run by simply calling it from a terminal using following arguments:
+<br class="shortbr">
+<code>filename</code> - string, name of the fits file
+<br class="shortbr">
+<code>scales</code> - list, list of size scales used to crop input images, optional (default: [1,2,3,4])
+<br class="shortbr">
+<code>threshold1</code> - float, between 0 and 1, calibrates volume error, optional (default: 0.4)
+<br class="shortbr">
+<code>threshold2</code> - float, between 0 and 1, calibrates false positive rate, optional (default: 0.65)
+
+</p>
+
+<br">
+
+<div class="python_code">
+<code id="python_code">$  python3 CADET.py filename [scales] [threshold1] [threshold2]</code>
+</div>
+
+<br class="longbr">
+
+<b>Example: </b>
+
+<br class="longbr">
+
+<div class="python_code">
+<code id="python_code">$ python3 CADET.py NGC5813.fits</code>
+<br class="shortbr">
+<code id="python_code">$ python3 CADET.py NGC5813.fits [1,2,3,4]</code>
+<br class="shortbr">
+<code id="python_code">$ python3 CADET.py NGC5813.fits [1,2,3,4] 0.5 0.9</code>
+</div>
+
+<br>
+
+<p>
+
+The <code>CADET.py</code> script loads a FITS file located in the 
+same folder which is specified by the <code>filename</code> argument, it creates a folder of the same name as the FITS file, 
+and saves corresponding pixel-wise as well as decomposed cavity predictions into the FITS 
+format while also properly preserving the WCS coordinates. On the output, there is also a 
+PNG file showing decomposed predictions for individual scales.
+
+<br class="longbr">
+
+<img src="../figures/NGC5813.png" style="width:100%">
+
+</p>
+
+<h2>Convolutional part</h2>
+
+<p>
+The convolutional part can be used separately to produce raw pixel-wise predictions. 
+Since the convolutional network was implemented using the 
+functional <em>Keras</em> API, the architectures together with trained weights could 
+have been stored in the HDF5 format (<em>CADET_size.h5</em>, <em>CADET_search.h5</em>). 
+The trained models can be simply loaded using the <code>load_model</code> <em>Keras</em> function.
+</p>
+
+<div class="python_code">
+<code id="python_code">
+from keras.models import load_model<br>
+<br>
+model = load_model("CADET.hdf5")<br>
+<br>
+y_pred = model.predict(X)
+</code>
+</div>
+
+<p>
+The network inputs 128x128 images. However, to maintain the compatibility with <em>Keras</em>, 
+the input needs to be reshaped as <code>X.reshape(1, 128, 128, 1)</code> for single image or as 
+<code>X.reshape(len(X), 128, 128, 1)</code> for multiple images.
+</p>
+
+<br class="shortbr">
+
+</section>
+
+</main>
+
+<footer>
+&#169; Tomáš Plšek <span style="font-weight: bolder;">&middot;</span> červenec 2021
+</footer>    
+
+</body>
+
+</html>

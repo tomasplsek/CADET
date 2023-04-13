@@ -1,0 +1,208 @@
+header {
+  color:white;
+  background-color:rgb(39, 120, 207);
+  font-family: arial, sans-serif;
+  font-size: 330%;
+  text-align: center;
+  padding-left: 60px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  font-weight: bolder;
+  border-radius: 13px;
+}
+
+body {
+  margin: auto;
+  height:100vh;
+  background-color:white;
+  padding: 5px;
+  font-family: arial, sans-serif
+}
+
+main {
+  margin: auto;
+  width: 850px;
+  min-height: calc(100vh - 40px);
+  background-color:white;
+  border-radius: 15px;
+  /* text-align: right; */
+}
+
+/* footer {
+  color: white;
+  padding: 10px;
+  font-size: 140%;
+  text-align: center;
+  background-color: rgb(39, 120, 207);
+  border-radius: 13px;
+} */
+
+footer {
+  margin: auto;
+  text-align: center;
+  font-size: 130%;
+  line-height: 4vh;
+  height: 4vh;
+  color: white;
+  background-color: rgb(39, 120, 207);
+  clear: both;
+  /* position: absolute; */
+  /* height: 200px;
+  margin-top: -200px; */
+}
+
+/* img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+} */
+
+/* code {
+    color: rgb(0, 0, 0);
+    border-radius: 2px;
+    background-color:rgba(155, 155, 155, 0.137);
+    font-size: 100%;
+} */
+
+#python_code {
+  /* font-family: Consolas,"courier new"; */
+  color: rgb(0, 0, 0);
+  background-color:rgba(155, 155, 155, 0);
+  /* padding: 3px; */
+  font-size: 100%;
+}
+
+.python_code {
+  /* margin: 4px; */
+  overflow: hidden;
+  border-radius: 4px;
+  /*  border: solid 1px black;*/
+  background-color:rgba(155, 155, 155, 0.137);
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+address {
+  font-style: normal;
+}
+
+button {
+  padding: 0px;
+}
+
+li {
+  color: "black";
+  padding-bottom: 4px;
+}
+
+h1 {
+  color:rgb(39, 120, 207);
+  font-size: 260%;
+}
+
+h2 {
+  color:rgb(39, 120, 207);
+}
+
+h3 {
+  color:rgb(39, 120, 207);
+}
+
+h4 {
+  color:rgb(39, 120, 207);
+}
+
+p {
+  text-indent: 0px;
+  color:black;
+  font-size:120%;
+  text-align: justify;
+  /* margin-right: 20px; */
+  /* margin-left: 20px; */
+}
+
+section {
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+/* #shortbr{
+  display: block;
+  margin: 5px 0;
+} */
+
+
+.shortbr{
+  margin-bottom: 8px;
+}
+
+.longbr{
+  margin-bottom: 20px;
+}
+
+#minusbr{
+  display: block;
+  margin: -3px 0;
+}
+
+.column {
+    float: left;
+}
+  
+  /* Clearfix (clear floats) */
+.row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+hr {
+  color:white;
+  border-style:inset;
+  border-width:1px;
+  width:100%
+}
+
+a:link, a:visited {
+  color:rgb(233, 88, 37)
+}
+
+a:hover {
+  color:red
+}
+
+.sidenav {
+  width: 160px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 22%; /* Stay at the top */
+  left: 11%;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 15px;
+  padding-bottom: 10px;
+  padding-right: 30px;
+  padding-left: 10px;
+  border-radius: 11px;
+  background-color: rgba(172, 172, 172, 0.2);
+}
+
+/* The navigation menu links */
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 25px;
+  color: rgb(39, 120, 207);
+  display: block;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  color: rgba(39, 120, 207, 0.6);
+}
+
+#menu {
+  padding-bottom: 11px;
+}

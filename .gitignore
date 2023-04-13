@@ -1,0 +1,5 @@
+.ipynb_checkpoints
+__py_cache__
+.vscode
+logs
+mock_data

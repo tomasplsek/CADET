@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Load FITS File</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fits/1.0.0/fits.min.js"></script>
+	<script>
+		window.onload = function() {
+			var fits = new Astro.FITS();
+			fits.onloaded = function() {
+				var header = fits.getHeader();
+				var values = "";
+				for (var i = 0; i < header.cards.length; i++) {
+					values += header.cards[i].keyword + " = " + header.cards[i].value + "<br>";
+				}
+				document.getElementById("fitsValues").innerHTML = values;
+			};
+			fits.load("NGC4649_512.fits");
+		};
+	</script>
+</head>
+<body>
+	<div id="fitsValues"></div>
+</body>
+</html>
