@@ -56,8 +56,8 @@ and applying <b><em>CADET</em></b> model manually (see Convolutional part).
 Before being decomposed by the DBSCAN algorithm, pixel-wise predictions produced by the convolutional 
 part of the <b><em>CADET</em></b> pipeline need to be further thresholded. In order to simultaneously 
 calibrate the volume error and false positive rate, we introduced two discrimination thresholds (for 
-more info see <a target="_blank" href="">Plšek et al. 2023</a> and their default values are 0.4 and 
-0.65, respectively. Nevertheless, both discrimination thresholds are changeable and can be set to an 
+more info see <a target="_blank" href="https://arxiv.org/abs/2304.05457">Plšek et al. 2023</a>) with default values of 0.4 and 
+0.6. Nevertheless, both discrimination thresholds are changeable and can be set to an 
 arbitrary value between 0 and 1.
 
 <br class="longbr">
@@ -135,6 +135,26 @@ y_pred = model.predict(X)
 The network inputs 128x128 images. However, to maintain the compatibility with <em>Keras</em>, 
 the input needs to be reshaped as <code>X.reshape(1, 128, 128, 1)</code> for single image or as 
 <code>X.reshape(len(X), 128, 128, 1)</code> for multiple images.
+</p>
+
+<p>
+Thus produced pixel-wise prediction needs to be further thresholded and decomposed into individual 
+cavities using a DBSCAN clustering algorithm:
+
+<div class="python_code">
+<code id="python_code">
+import numpy as np
+from sklearn.cluster import DBSCAN<br>
+<br>
+y_pred = np.where(y_pred > threshold, 1, 0)<br>
+<br>
+x, y = y_pred.nonzero()<br>
+data = np.array([x,y]).reshape(2, -1)<br>
+<br>
+clusters = DBSCAN(eps=1.5, min_samples=3).fit(data.T).labels_
+</code>
+</div>
+
 </p>
 
 <br class="shortbr">

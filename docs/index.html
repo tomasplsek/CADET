@@ -32,28 +32,22 @@
 
 <h1>Overview</h1>
 
-<p>
-<b><em>CADET_size</em></b> is a machine learning pipeline trained for identifying surface 
-brightness depressions (so-called <em>X-ray cavities</em>) on noisy <em>Chandra</em> 
-images of elliptical galaxies. The pipeline consists of a convolutional 
-neural network trained for producing pixel-wise cavity predictions, 
-which are afterwards decomposed into individual cavities using a DBSCAN 
-clustering algorithm.
-</p>
+    <p>
+        <a href="https://tomasplsek.github.io/CADET/">CADET</a> is a machine learning pipeline trained for identification of 
+        surface brightness depressions (so-called <em>X-ray cavities</em>) on noisy <em>Chandra</em> images of early-type 
+        galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained for producing pixel-wise 
+        cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities.
+    </p>
 
-<p>
-The pipeline was developed as a part of my 
-<a target="_blank" href="https://is.muni.cz/th/x68od/?lang=en">Diploma thesis</a> 
-(<a href="/pdfs/diploma_thesis.pdf">pdf</a>) to improve the automation 
-and accuracy of the detection and size-estimation of <em>X-ray cavities</em>. 
-The architecture of the convolutional network consists of 5 convolutional 
-blocks, each resembling an inception layer, and it's development was 
-inspired by <a target="_blank" href="https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract">Fort et al. 2017</a> 
-and <a target="_blank" href="https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411">Secká 2019</a>. 
-The utilized clustering algorithm is the <em>Sklearn</em> implementation of the 
-Density-Based Spatial Clustering of Applications with Noise (DBSCAN, 
-<a target="_blank" href="https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.121.9220">Ester et al. 1996</a>).
-</p>
+    <p>
+        The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an 
+        nception layer, it was implemented using <em>Keras</em> library and it's development was inspired by 
+        <a href="https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract">Fort et al. 2017</a> and 
+        <a href="https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411">Secká 2019</a>. For the clustering, 
+        we utilized is the <em>Scikit-learn</em> implementation of the Density-Based Spatial Clustering of 
+        Applications with Noise (DBSCAN, 
+        <a href="https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.121.9220">Ester et al. 1996</a>).
+    </p>
 
 <br>
 
