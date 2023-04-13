@@ -1,71 +1,20 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-	<title>Load FITS File</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/fits/1.0.0/fits.min.js"></script>
-	<script>
-		window.onload = function() {
-			var fits = new Astro.FITS();
-			fits.onloaded = function() {
-				var header = fits.getHeader();
-				var values = "";
-				for (var i = 0; i < header.cards.length; i++) {
-					values += header.cards[i].keyword + " = " + header.cards[i].value + "<br>";
-				}
-				document.getElementById("fitsValues").innerHTML = values;
-			};
-			fits.load("NGC4649_512.fits");
-		};
-	</script>
-</head>
-<body>
-	<div id="fitsValues"></div>
-</body>
-</html> -->
-
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>FITS file uploader</title>
-    <script src="https://unpkg.com/fitsjs"></script>
-  </head>
-  <body>
-    <h1>FITS file uploader</h1>
-    <input type="file" id="fits-file" accept=".fits">
-    <button onclick="loadFITS()">Load FITS file</button>
-    <br><br>
-    <canvas id="fits-canvas"></canvas>
-    
-    <script>
-      function loadFITS() {
-        var fileInput = document.getElementById('fits-file');
-        var fitsCanvas = document.getElementById('fits-canvas');
-        var file = fileInput.files[0];
-        var fits = new fitsjs.FITS(file);
-        
-        fits.getHeader((header) => {
-          console.log(header);
-        });
-        
-        fits.getData((data) => {
-          var ctx = fitsCanvas.getContext('2d');
-          var imageData = ctx.createImageData(data.width, data.height);
-          
-          // Normalize data to 0-255 range
-          var min = data.min();
-          var max = data.max();
-          var range = max - min;
-          for (var i = 0; i < data.length; i++) {
-            imageData.data[i*4] = imageData.data[i*4+1] = imageData.data[i*4+2] = (data[i] - min) * 255 / range;
-            imageData.data[i*4+3] = 255; // Set alpha channel to fully opaque
-          }
-          
-          fitsCanvas.width = data.width;
-          fitsCanvas.height = data.height;
-          ctx.putImageData(imageData, 0, 0);
-        });
-      }
-    </script>
-  </body>
+<head>
+	<title>FITS File Upload and Plotting</title>
+</head>
+<body>
+	<h1>FITS File Upload and Plotting</h1>
+	<form action="upload" method="post" enctype="multipart/form-data">
+		<label for="fits_file">Select a FITS file to upload:</label><br>
+		<input type="file" id="fits_file" name="fits_file"><br>
+		<input type="submit" value="Upload and Plot">
+	</form>
+	<div>
+		<h2>Plot</h2>
+		<canvas id="fits_plot"></canvas>
+	</div>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<script src="plot_fits.js"></script>
+</body>
 </html>
