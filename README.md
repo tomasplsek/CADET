@@ -5,17 +5,7 @@
 <!-- The pipeline was developed in order to improve the automation and accuracy of X-ray cavity detection and size-estimation.  -->
 The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an Inception layer, it was implemented using *Keras* library and it's development was inspired by [Fort et al. 2017](https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract) and [Secká 2019](https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411). For the clustering, we utilized is the *Scikit-learn* implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN, [Ester et al. 1996](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.121.9220)).
 
-<br>
-<br>
-<br>
-<br>
-
 ![Architecture](figures/architecture.png)
-
-<br>
-<br>
-<br>
-<br>
 
 ## Requirements
 
