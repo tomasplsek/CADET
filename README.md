@@ -83,7 +83,7 @@ data = np.array([x,y]).reshape(2, -1)
 clusters = DBSCAN(eps=1.5, min_samples=3).fit(data.T).labels_
 ```
 
-## How to cite (!!!NOT-PUBLISHED YET!!!)
+## How to cite
 
 The ***CADET*** pipeline was originally developed as a part of my [diploma thesis](https://is.muni.cz/th/x68od/?lang=en) and was further described in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457). If you use the ***CADET***  pipeline in your research, please cite the following paper:
 
