@@ -2,29 +2,35 @@ header {
   color:white;
   background-color:rgb(39, 120, 207);
   font-family: arial, sans-serif;
+  /* font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif ; */
+  /* font-family: Verdana, Geneva, Tahoma, sans-serif; */
   font-size: 330%;
   text-align: center;
-  padding-left: 60px;
-  padding-top: 40px;
-  padding-bottom: 40px;
+  /* padding-left: 40px; */
+  padding-top: 20px;
+  padding-bottom: 20px;
   font-weight: bolder;
-  border-radius: 13px;
+  /* border-radius: 13px; */
+  width: 100vw;
 }
 
 body {
   margin: auto;
   height:100vh;
   background-color:white;
-  padding: 5px;
-  font-family: arial, sans-serif
+  /* padding: 1px; */
+  /* font-family: arial, sans-serif */
+  /* font-family: Verdana, Geneva, Tahoma, sans-serif; */
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif ;
 }
 
 main {
   margin: auto;
-  width: 850px;
+  /* width: 850px; */
+  width: 45vw;
   min-height: calc(100vh - 40px);
   background-color:white;
-  border-radius: 15px;
+  /* border-radius: 15px; */
   /* text-align: right; */
 }
 
@@ -118,7 +124,8 @@ h4 {
 p {
   text-indent: 0px;
   color:black;
-  font-size:120%;
+  font-size:110%;
+  line-height: 145%;
   text-align: justify;
   /* margin-right: 20px; */
   /* margin-left: 20px; */
@@ -133,7 +140,6 @@ section {
   display: block;
   margin: 5px 0;
 } */
-
 
 .shortbr{
   margin-bottom: 8px;
@@ -167,7 +173,8 @@ hr {
 }
 
 a:link, a:visited {
-  color:rgb(233, 88, 37)
+  /* color:rgb(233, 88, 37) */
+  color:rgb(0, 102, 255)
 }
 
 a:hover {
@@ -175,17 +182,19 @@ a:hover {
 }
 
 .sidenav {
-  width: 160px; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  width: 185px; /* Set the width of the sidebar */
+  /* position: fixed; */
+  position: absolute;
   z-index: 1; /* Stay on top */
-  top: 22%; /* Stay at the top */
-  left: 11%;
+  top: 16%; /* Stay at the top */
+  left: 10%;
   overflow-x: hidden; /* Disable horizontal scroll */
+  font-weight: 500;
   padding-top: 15px;
   padding-bottom: 10px;
   padding-right: 30px;
   padding-left: 10px;
-  border-radius: 11px;
+  border-radius: 7px;
   background-color: rgba(172, 172, 172, 0.2);
 }
 
@@ -200,9 +209,31 @@ a:hover {
 
 /* When you mouse over the navigation links, change their color */
 .sidenav a:hover {
-  color: rgba(39, 120, 207, 0.6);
+  color: rgba(39, 120, 207, 0.774);
 }
 
 #menu {
   padding-bottom: 11px;
+}
+
+.cadet_logo {
+  float: right; 
+  width: 290px; 
+  padding-right: 120px; 
+  position: absolute; 
+  left: 79%; 
+  top: 13%;
+}
+
+.github_logo {
+  position: relative; 
+  width: 100px; 
+  left: 0%; 
+  top: -99px; 
+  float: right; 
+  margin-right: 0px;
+}
+
+.figure_caption {
+  font-size: 93%;
 }

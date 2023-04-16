@@ -23,6 +23,13 @@ If you want to re-train the network from scratch or generate training images, an
 
 ## Usage
 
+<!-- ### Online CADET app
+
+***CADET*** pipeline can be used as a [web application](https://tomasplsek.github.io/CADET/) implemented 
+using [Streamlit](https://streamlit.io/) library and hosted on [HuggingFace Spaces](https://huggingface.co/spaces/Plsek/CADET).
+
+### Running CADET localy -->
+
 The ***CADET*** pipeline inputs either raw *Chandra* images in units of counts (numbers of captured photons) or exposure-corrected images. When using exposure-corrected images, images should be normalized by the lowest pixel value so all pixels are higher than or equal to 1. For images with many point sources, they should be filled with surrounding background level using Poisson statistics ([dmfilth](https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html) within [CIAO](https://cxc.harvard.edu/ciao/)).
 
 Convolutional part of the ***CADET*** pipeline can only input 128x128 images. As a part of the pipeline, input images are therefore being cropped to a size specified by parameter scale (size = scale * 128 pixels) and re-binned to 128x128 images. By default, images are probed on 4 different scales (1,2,3,4). The size of the image inputted into the pipeline therefore needs to at least 512x512 pixels (minimal input size differs if non-default scales are used) and images should be centred at the centre of the galaxy. The re-binning is performed using *Astropy* and *Numpy* libraries and can only handle integer binsizes. For floating point number binning, we recommend using [dmregrid](https://cxc.cfa.harvard.edu/ciao/ahelp/dmregrid.html) and applying ***CADET*** model manually (see Convolutional part).
