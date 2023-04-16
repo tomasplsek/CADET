@@ -69,7 +69,7 @@ y_pred = model.predict(X)
 
 The CNN network inputs 128x128 images, however, to maintain the compatibility with *Keras*, the input needs to be reshaped as `X.reshape(1, 128, 128, 1)` for single image or as `X.reshape(-1, 128, 128, 1)` for multiple images.
 
-Alternatively, the CNN model can be imported from HuggingFace's [model hub](https://huggingface.co/tomasplsek/CADET):
+Alternatively, the CNN model can be imported from HuggingFace's [model hub](https://huggingface.co/Plsek/CADET-v1):
 
 ```python
 from huggingface_hub import from_pretrained_keras
