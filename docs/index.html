@@ -8,7 +8,6 @@
 
 <body>
 <link rel="stylesheet" href="styles.css">
-<!-- <link rel="stylesheet" href="prism.css"> -->
 
 <header>
     <em>Cavity Detection Tool</em>  (CADET)
@@ -32,32 +31,34 @@
 
 <section>
 
-<h1>Overview</h1>
-    <p>
-        <!-- <a href="https://tomasplsek.github.io/CADET/">CADET</a>  -->
-        <b><em>CADET</em></b> is a machine learning pipeline trained for identification of 
-        surface brightness depressions (<b><em>X-ray cavities</em></b>) on noisy <em>Chandra</em> images of early-type 
-        galaxies and galaxy clusters. The pipeline consists of a <b>convolutional neural network</b> trained for producing pixel-wise 
-        cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities. 
-        The pipeline is further described in <a target="_blank" href="https://arxiv.org/abs/2304.05457">[Plšek2023]</a>.
-    </p>
+<!-- <h1>Overview</h1> -->
 
-    <p>
-        The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an 
-        <b>Inception layer</b>, and it's development was inspired by 
-        <a target="_blank" href="https://arxiv.org/abs/1712.00523">[Fort2017]</a> and 
-        <a target="_blank" href="https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411">[Secka2019]</a>. 
-        The convolutional neural network (CNN) was implemented using a high-level Python <em><b>Keras</b></em> 
-        library with <em><b>Tensorflow</b></em> back-end. The CNN was written using a functional <em>Keras</em> 
-        API which enables saving and loading the model into the Hierarchical Data Format (<b>HDF5</b>) without 
-        the need to re-defining the model when loading. In total, the network has <b>563&thinsp;146 trainable 
-        parameters</b> and the size of the model is <b>7.4MB</b>. For the clustering, we utilized is the 
-        <em>Scikit-learn</em> implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN, 
-        <a target="_blank" href="https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.121.9220">[Ester1996]</a>).
-        For monitoring learning curves, comparing final test statistics and selecting optimal hyper-parameters, 
-        we used the <em>Tensorboard</em> dash-boarding tool.    
-    
-    </p>
+<br class="shortbr">
+
+<p>
+    <b><em>CADET</em></b> is a machine learning pipeline trained for identification of 
+    surface brightness depressions (<b><em>X-ray cavities</em></b>) on noisy <em>Chandra</em> images of early-type 
+    galaxies and galaxy clusters. The pipeline consists of a <b>convolutional neural network</b> trained for producing pixel-wise 
+    cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities. 
+    The pipeline is further described in <a target="_blank" href="https://arxiv.org/abs/2304.05457">[Plšek2023]</a>.
+</p>
+
+<p>
+    The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an 
+    <b>Inception layer</b>, and it's development was inspired by 
+    <a target="_blank" href="https://arxiv.org/abs/1712.00523">[Fort2017]</a> and 
+    <a target="_blank" href="https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411">[Secka2019]</a>. 
+    The convolutional neural network (CNN) was implemented using a high-level Python <em><b>Keras</b></em> 
+    library with <em><b>Tensorflow</b></em> back-end. The CNN was written using a functional <em>Keras</em> 
+    API which enables saving and loading the model into the Hierarchical Data Format (<b>HDF5</b>) without 
+    the need to re-defining the model when loading. In total, the network has <b>563&thinsp;146 trainable 
+    parameters</b> and the size of the model is <b>7.4MB</b>. For the clustering, we utilized is the 
+    <em>Scikit-learn</em> implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN, 
+    <a target="_blank" href="https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.121.9220">[Ester1996]</a>).
+    For monitoring learning curves, comparing final test statistics and selecting optimal hyper-parameters, 
+    we used the <em>Tensorboard</em> dash-boarding tool.    
+
+</p>
 
 <br>
 
@@ -76,50 +77,48 @@
 <h2>Network architecture</h2>
 
 <p>
+    On the input of the CNN, there is a single channel <b>128x128 image</b>. Since radial profiles of β-models in 
+    both real and simulated images are rather exponential, we transform the input images by a <b>decimal 
+    logarithm</b> (the value of each pixel was raised by one to avoid calculating the logarithm of zero).
+    Before the images are processed by the first Inception-like convolutional block, they are further 
+    normalized in mini-batches by a <b>batch-normalization</b> layer within the convolutional neural network.
 
-On the input of the CNN, there is a single channel <b>128x128 image</b>. Since radial profiles of β-models in 
-both real and simulated images are rather exponential, we transform the input images by a <b>decimal 
-logarithm</b> (the value of each pixel was raised by one to avoid calculating the logarithm of zero).
-Before the images are processed by the first Inception-like convolutional block, they are further 
-normalized in mini-batches by a <b>batch-normalization</b> layer within the convolutional neural network.
+    <br class="longbr">
 
-<br class="longbr">
+    The architecture of the convolutional neural network is similar to that developed by <a href="https://arxiv.org/abs/1712.00523">[Fort2017]</a> and 
+    is composed of a series of <b>5 convolutional blocks</b>. Each block resembles an <b>Inception-like layer</b> 
+    <a href="https://arxiv.org/abs/1502.03167">[Szegedy2015]</a> as it applies a set of multiple parallel 2D 
+    convolutions with various kernel sizes and concatenates their outputs. Inception layers within the first 4 blocks 
+    consist of convolutional layers with 32 of 1x1 filters, <b>32 of 3x3 filters</b>, <b>16 of 5x5 filters</b>, 
+    <b>8 of 7x7 filters</b>, <b>4 of 9x9 filters</b>, <b>2 of 11x11 filters</b>, and <b>one 13x13 filter</b>. 
+    The output of each convolutional layer within the Inception-like layer is activated by Rectified Linear 
+    Unit (ReLU; <a target="_blank" href="https://link.springer.com/article/10.1007/BF00342633">[Fukushima1975]</a>) 
+    activation function, which brings non-linear elements into the network, and then normalized by batch normalization 
+    <a target="_blank" href="https://arxiv.org/abs/1502.03167">[Ioffe2015]</a>. Each Inception layer is then followed by a 
+    2D convolutional layer with 32 or 64 of 1x1 filters, which is introduced mainly due to dimensionality reduction.
+    The output of this convolutional layer is also activated using the ReLU activation function and batch-normalized. 
+    The 1x1 convolutional layers are, in order to prevent overfitting, followed by a dropout layer, where 
+    the dropout rate was varied as a hyper-parameter. Weights of individual 2D convolutional layers were generated 
+    using <a href="https://arxiv.org/abs/1512.03385">[He2015]</a> initialization, and biases were initialized with low but non-zero values (0.01).
 
-The architecture of the convolutional neural network is similar to that developed by <a href="https://arxiv.org/abs/1712.00523">[Fort2017]</a> and 
-is composed of a series of <b>5 convolutional blocks</b>. Each block resembles an <b>Inception-like layer</b> 
-<a href="https://arxiv.org/abs/1502.03167">[Szegedy2015]</a> as it applies a set of multiple parallel 2D 
-convolutions with various kernel sizes and concatenates their outputs. Inception layers within the first 4 blocks 
-consist of convolutional layers with 32 of 1x1 filters, <b>32 of 3x3 filters</b>, <b>16 of 5x5 filters</b>, 
-<b>8 of 7x7 filters</b>, <b>4 of 9x9 filters</b>, <b>2 of 11x11 filters</b>, and <b>one 13x13 filter</b>. 
-The output of each convolutional layer within the Inception-like layer is activated by Rectified Linear 
-Unit (ReLU; <a target="_blank" href="https://link.springer.com/article/10.1007/BF00342633">[Fukushima1975]</a>) 
-activation function, which brings non-linear elements into the network, and then normalized by batch normalization 
-<a target="_blank" href="https://arxiv.org/abs/1502.03167">[Ioffe2015]</a>. Each Inception layer is then followed by a 
-2D convolutional layer with 32 or 64 of 1x1 filters, which is introduced mainly due to dimensionality reduction.
-The output of this convolutional layer is also activated using the ReLU activation function and batch-normalized. 
-The 1x1 convolutional layers are, in order to prevent overfitting, followed by a dropout layer, where 
-the dropout rate was varied as a hyper-parameter. Weights of individual 2D convolutional layers were generated 
-using <a href="https://arxiv.org/abs/1512.03385">[He2015]</a> initialization, and biases were initialized with low but non-zero values (0.01).
+    <br class="longbr">
 
-<br class="longbr">
+    The convolutional neural network is ended by a final block, which is also composed as an Inception-like 
+    layer but differs from the previous blocks by the number and sizes of individual 2D convolutional 
+    filters (<b>8 of 8x8 filters</b>, <b>4 of 16x16 filters</b>, <b>2 of 32x32 filters</b>, and <b>one 64x64 filter</b>) and also 
+    by the activation function of the last 1x1 convolutional filter. Since the output of the network is 
+    intended to be a prediction of whether a corresponding pixel belongs to a cavity (value 1) or not (value 0), 
+    the activation function of the final layer was set to be the <b><em>sigmoid</em></b> function, which 
+    outputs real numbers in the range between 0 and 1.
 
-The convolutional neural network is ended by a final block, which is also composed as an Inception-like 
-layer but differs from the previous blocks by the number and sizes of individual 2D convolutional 
-filters (<b>8 of 8x8 filters</b>, <b>4 of 16x16 filters</b>, <b>2 of 32x32 filters</b>, and <b>one 64x64 filter</b>) and also 
-by the activation function of the last 1x1 convolutional filter. Since the output of the network is 
-intended to be a prediction of whether a corresponding pixel belongs to a cavity (value 1) or not (value 0), 
-the activation function of the final layer was set to be the <b><em>sigmoid</em></b> function, which 
-outputs real numbers in the range between 0 and 1.
+    <br class="longbr">
 
-<br class="longbr">
-
-On the output of the CNN, there is a <b>pixel-wise prediction</b> of the same shape as the input image 
-with a value in each pixel <b>ranging from 0 to 1</b>, which expresses whether that pixel corresponds to a cavity or not.
-The pixel-wise prediction is then decomposed into individual X-ray cavities using the DBSCAN clustering 
-algorithm. Before the decomposition, a <b>pair of discrimination thresholds</b> are applied for the pixel-wise 
-prediction excluding low-significance regions and keeping only solid cavity predictions while properly 
-estimating their areas and volumes.
-
+    On the output of the CNN, there is a <b>pixel-wise prediction</b> of the same shape as the input image 
+    with a value in each pixel <b>ranging from 0 to 1</b>, which expresses whether that pixel corresponds to a cavity or not.
+    The pixel-wise prediction is then decomposed into individual X-ray cavities using the DBSCAN clustering 
+    algorithm. Before the decomposition, a <b>pair of discrimination thresholds</b> are applied for the pixel-wise 
+    prediction excluding low-significance regions and keeping only solid cavity predictions while properly 
+    estimating their areas and volumes.
 </p>
 
 <br>

@@ -186,7 +186,7 @@ a:hover {
   /* position: fixed; */
   position: absolute;
   z-index: 1; /* Stay on top */
-  top: 16%; /* Stay at the top */
+  top: 13.5%; /* Stay at the top */
   left: 10%;
   overflow-x: hidden; /* Disable horizontal scroll */
   font-weight: 500;
@@ -194,7 +194,7 @@ a:hover {
   padding-bottom: 10px;
   padding-right: 30px;
   padding-left: 10px;
-  border-radius: 7px;
+  border-radius: 4px;
   background-color: rgba(172, 172, 172, 0.2);
 }
 
