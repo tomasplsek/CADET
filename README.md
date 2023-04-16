@@ -69,7 +69,15 @@ y_pred = model.predict(X)
 
 The CNN network inputs 128x128 images, however, to maintain the compatibility with *Keras*, the input needs to be reshaped as `X.reshape(1, 128, 128, 1)` for single image or as `X.reshape(-1, 128, 128, 1)` for multiple images.
 
-Thus produced pixel-wise prediction needs to be further thresholded and decomposed into individual cavities using a DBSCAN clustering algorithm:
+Alternatively, the CNN model can be imported from HuggingFace's [model hub](https://huggingface.co/tomasplsek/CADET):
+
+```python
+from huggingface_hub import from_pretrained_keras
+
+model = from_pretrained_keras("Plsek/CADET-v1")
+```
+
+<!-- Thus produced pixel-wise prediction needs to be further thresholded and decomposed into individual cavities using a DBSCAN clustering algorithm:
 
 ```python
 import numpy as np
@@ -81,7 +89,7 @@ x, y = y_pred.nonzero()
 data = np.array([x,y]).reshape(2, -1)
 
 clusters = DBSCAN(eps=1.5, min_samples=3).fit(data.T).labels_
-```
+``` -->
 
 ## How to cite
 
