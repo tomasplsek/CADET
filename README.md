@@ -82,6 +82,8 @@ Alternatively, the CNN model can be imported from HuggingFace's [model hub](http
 from huggingface_hub import from_pretrained_keras
 
 model = from_pretrained_keras("Plsek/CADET-v1")
+
+y_pred = model.predict(X)
 ```
 
 <!-- Thus produced pixel-wise prediction needs to be further thresholded and decomposed into individual cavities using a DBSCAN clustering algorithm:
