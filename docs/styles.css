@@ -222,13 +222,13 @@ a:hover {
   padding-right: 120px; 
   position: absolute; 
   left: 79%; 
-  top: 13%;
+  top: 12%;
 }
 
 .github_logo {
   position: relative; 
   width: 100px; 
-  left: 0%; 
+  left: 0%;
   top: -99px; 
   float: right; 
   margin-right: 0px;
