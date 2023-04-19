@@ -1,0 +1,5 @@
+[theme]
+backgroundColor="#FFFFFF"
+
+[server]
+enableXsrfProtection = false
