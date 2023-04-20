@@ -11,8 +11,6 @@ from matplotlib.patches import Rectangle
 from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.nddata import Cutout2D, CCDData
-from astropy.convolution import Gaussian2DKernel as Gauss
-from astropy.convolution import convolve
 
 # Scikit-learn
 from sklearn.cluster import DBSCAN
@@ -23,7 +21,6 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(page_title="Cavity Detection Tool", layout="wide")
 
 # HuggingFace Hub
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 from huggingface_hub import from_pretrained_keras
 # from tensorflow.keras.models import load_model
 
@@ -49,17 +46,15 @@ def plot_prediction(pred):
 def plot_decomposed(decomposed):
     plt.figure(figsize=(4, 4))
     plt.imshow(decomposed, origin="lower")
-
     N = int(np.max(decomposed))
     for i in range(N):
         new = np.where(decomposed == i+1, 1, 0)
         x0, y0 = center_of_mass(new)
         color = "white" if i < N//2 else "black"
         plt.text(y0, x0, f"{i+1}", ha="center", va="center", fontsize=15, color=color)
-    
     plt.axis('off')
     with colC: st.pyplot()
-        
+
 # Define function to cut input image and rebin it to 128x128 pixels
 def cut(data0, wcs0, scale=1):
     shape = data0.shape[0]
@@ -84,7 +79,7 @@ def cut(data0, wcs0, scale=1):
     return data, wcs
 
 # Define function to apply cutting and produce a prediction
-@st.cache_data
+@st.cache #_data
 def cut_n_predict(data, _wcs, scale):
     data, wcs = cut(data, _wcs, scale=scale)
     image = np.log10(data+1)
@@ -99,7 +94,7 @@ def cut_n_predict(data, _wcs, scale):
     return y_pred, wcs
 
 # Define function to decompose prediction into individual cavities
-@st.cache_data
+@st.cache #_data
 def decompose_cavity(pred, fname, th2=0.7, amin=10):
     X, Y = pred.nonzero()
     data = np.array([X,Y]).reshape(2, -1)
@@ -138,21 +133,25 @@ def decompose_cavity(pred, fname, th2=0.7, amin=10):
     
     return image_decomposed
 
-@st.cache_data
+# Define function that loads FITS file and return data & wcs
+@st.cache #_data
 def load_file(fname):
     with fits.open(fname) as hdul:
         data = hdul[0].data
         wcs = WCS(hdul[0].header)
     return data, wcs
 
-@st.cache_resource
+# Define function to load model
+@st.cache(allow_output_mutation=True) #_resource
 def load_CADET():
     model = from_pretrained_keras("Plsek/CADET-v1")
     # model = load_model("CADET.hdf5")
     return model
 
+
 def reset_threshold():
-    del st.session_state["threshold"]
+    # del st.session_state["threshold"]
+    st.session_state['threshold'] = 0.0
 
 
 # Load model
@@ -168,17 +167,28 @@ os.system("rm -R -- */")
 # os.system("mkdir -p predictions")
 
 with col:
-    # Create heading and description
-    st.markdown("<h1 align='center'>Cavity Detection Tool</h1>", unsafe_allow_html=True)    
-    st.markdown("Cavity Detection Tool (CADET) is a machine learning pipeline trained to detect X-ray cavities from noisy Chandra images of early-type galaxies.")
-    st.markdown("To use this tool: upload your image, select the scale of interest, make a prediction, and decompose it into individual cavities!")
-    st.markdown("Input images should be in units of counts, centred at the galaxy center, and point sources should be filled with surrounding background ([dmfilth](https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html)).")
-    st.markdown("If you use this tool for your research, please cite [Plšek et al. 2023](https://arxiv.org/abs/2304.05457)")
+    with st.container():
+        # Create heading and description
+        st.markdown("<h1 align='center'>Cavity Detection Tool</h1>", unsafe_allow_html=True)    
+        # st.markdown("Cavity Detection Tool (CADET) is a machine learning pipeline trained to detect X-ray cavities from noisy Chandra images of early-type galaxies.")
+        # st.markdown("To use this tool: upload your image, select the scale of interest, make a prediction, and decompose it into individual cavities!")
+        # st.markdown("Input images should be FITS files in units of counts, centred at the galaxy center, and point sources should be filled with surrounding background ([dmfilth](https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html)).")
+        # st.markdown("If you use this tool for your research, please cite [Plšek et al. 2023](https://arxiv.org/abs/2304.05457)")
+
+        st.markdown("<div style='border-radius:5px;background-color:#F3F4F6;padding-top:8px;padding-bottom:8px;padding-left:14px;padding-right:14px;line-height:140%;font-size:120%'>\
+Cavity Detection Tool (CADET) is a machine learning pipeline trained to detect <b>X-ray cavities</b> from <b><em>Chandra</em></b> images of early-type galaxies, groups, and clusters. \
+To use this tool: <b>1)</b> upload your image, <b>2)</b> select the scale of interest, <b>3)</b> make a prediction, and <b>4)</b> decompose it into individual cavities! \
+Input images should be FITS files in units of counts, centred at the galaxy center, and point sources should be filled with surrounding background \
+(<a href='https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html'>dmfilth</a>). <br><br>\
+If you use this tool for your research, please cite <a href='https://arxiv.org/abs/2304.05457'>Plšek et al. 2023</a>.\
+</div><br>", unsafe_allow_html=True)
+
+        
 
 # _, col_1, col_2, col_3, _ = st.columns([bordersize, 2.0, 0.5, 0.5, bordersize])
 
 # with col:
-    uploaded_file = st.file_uploader("Choose a FITS file", type=['fits']) #, on_change=reset_threshold)
+    uploaded_file = st.file_uploader("Choose a FITS file", type=['fits'], on_change=reset_threshold)
 
     # with col_2:
     #     st.markdown("### Examples")
@@ -208,6 +218,7 @@ col3.subheader("Prediction")
 col5.subheader("Decomposed")
 col6.subheader("")
 
+# Scale selectbox
 with col1:
     st.markdown("""<style>[data-baseweb="select"] {margin-top: -46px;}</style>""", unsafe_allow_html=True)
     max_scale = int(data.shape[0] // 128)
@@ -221,7 +232,7 @@ with col3: detect = st.button('Detect', key="detect")
 with col4:
     st.markdown("")
     # st.markdown("""<style>[data-baseweb="select"] {margin-top: -36px;}</style>""", unsafe_allow_html=True)
-    threshold = st.slider("Threshold", 0.0, 1.0, 0.0, 0.05, key="threshold") #, label_visibility="hidden")
+    threshold = st.slider("Threshold", min_value=0.0, max_value=1.0, step=0.05, key="threshold") #, label_visibility="hidden")
     
 # Decompose button
 with col5: decompose = st.button('Decompose', key="decompose")
@@ -258,6 +269,6 @@ if uploaded_file is not None:
                     res = f.read()
                 
                 download = st.download_button(label="Download", data=res, key="download", 
-                                                file_name=f'{fname}_{int(scale*128)}.zip', 
+                                                file_name=f'{fname}_{int(scale*128)}.zip',
                                                 # disabled=st.session_state.get("disabled", True), 
                                                 mime="application/octet-stream")
