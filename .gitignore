@@ -3,3 +3,5 @@ __py_cache__
 .vscode
 logs
 mock_data
+CADET_best.hdf5
+CADET_final.hdf5

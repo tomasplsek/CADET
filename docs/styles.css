@@ -84,7 +84,8 @@ footer {
   overflow: hidden;
   border-radius: 4px;
   /*  border: solid 1px black;*/
-  background-color:rgba(155, 155, 155, 0.137);
+  background-color:rgba(245, 245, 245);
+  border: solid 1px rgb(204, 204, 204);
   padding-top: 12px;
   padding-bottom: 12px;
   padding-left: 15px;
