@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script> -->
-<!-- <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script> -->
-<!-- <script src="https://gist.github.com/username/a39a422ebdff6e732753b90573100b16.js"></script> -->
 <title>CADET</title>
 <link rel="icon" href="figures/CADET.png">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -20,21 +17,19 @@
     <img src="figures/github.png" alt="github.com/tomasplsek/CADET" class="github_logo">
 </a>
 
+<main>
+
 <img src="figures/CADET.png" class="cadet_logo">
 
 <div class="sidenav">
-<a id="menu" href="index.html">Overview</a>
-<a id="menu" href="training.html">Training</a>
-<a id="menu" href="results.html">Results</a>
-<a style="color: rgb(20, 97, 179);font-weight: 600;" id="menu" href="usage.html">How to use</a>
-<!-- <a id="menu" href="online.html">Web app</a> -->
+    <a id="menu" href="index.html">Overview</a>
+    <a id="menu" href="training.html">Training</a>
+    <a id="menu" href="results.html">Results</a>
+    <a style="color: rgb(20, 97, 179);font-weight: 600;" id="menu" href="usage.html">How to use</a>
+    <!-- <a id="menu" href="online.html">Web app</a> -->
 </div>
 
-<main>
-
 <section>
-
-<!-- <h1>How to use</h1> -->
 
 <br class="shortbr">
 
@@ -45,7 +40,7 @@ using <a href="https://streamlit.io/">Streamlit</a> library and hosted on <a hre
 
 <h2><em>CADET.py</em> script</h2>
 <p>
-    The <b><em>CADET</em></b> pipeline is composed as a self-standing Python script (<code>CADET.py</code>), which can 
+    The <b><em>CADET</em></b> pipeline is composed as a self-standing Python script (<a href="../CADET.py"><code>CADET.py</code></a>), which can 
     be run by simply calling it from a terminal using following arguments:
 
     <br class="longbr">
@@ -108,7 +103,7 @@ using <a href="https://streamlit.io/">Streamlit</a> library and hosted on <a hre
     Before being decomposed by the DBSCAN algorithm, pixel-wise predictions produced by the convolutional 
     part of the <b><em>CADET</em></b> pipeline need to be further thresholded. In order to simultaneously 
     calibrate the volume error and false positive rate, we introduced two discrimination thresholds (for 
-    more info see <a target="_blank" href="https://arxiv.org/abs/2304.05457">Plšek et al. 2023</a>) with default values of 0.4 and 
+    more info see <a target="_blank" href="https://arxiv.org/abs/2304.05457">[Plšek2023]</a>) with default values of 0.4 and 
     0.6. Nevertheless, both discrimination thresholds are changeable and can be set to an 
     arbitrary value between 0 and 1.
 
@@ -130,12 +125,14 @@ using <a href="https://streamlit.io/">Streamlit</a> library and hosted on <a hre
     384x384 pixels, and 512x512 pixels.
 </p>
 
+<br class="minibr">
+
 <h2>Convolutional part</h2>
 
 <p>
     The convolutional part can be used separately to produce raw pixel-wise predictions. Since the convolutional 
     network was implemented using the functional <em>Keras</em> API, the architectures together with 
-    trained weights could have been stored in the HDF5 format (<em>CADET_size.h5</em>, <em>CADET_search.h5</em>). 
+    trained weights could have been stored in the HDF5 format (<a href="../CADET.hdf5"><code>CADET.hdf5</code></a>). 
     The trained models can be simply loaded using the <code>load_model</code> <em>Keras</em> function.
 </p>
 
@@ -156,7 +153,7 @@ using <a href="https://streamlit.io/">Streamlit</a> library and hosted on <a hre
 
     <br class="shortbr">
 
-    <br class="longbr">
+    <br class="shortbr">
 
     Alternatively, the CNN model can be imported from HuggingFace's 
     <a target="_blank" href="https://huggingface.co/Plsek/CADET-v1">model hub</a>:
@@ -193,7 +190,7 @@ using <a href="https://streamlit.io/">Streamlit</a> library and hosted on <a hre
     </code>
 </div>
 
-<br class="shortbr">
+<br class="longbr">
 
 </section>
 
