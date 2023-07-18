@@ -1,80 +1,96 @@
 # *Cavity Detection Tool* (CADET)
 
-[***CADET***](https://tomasplsek.github.io/CADET/) is a machine learning pipeline trained for identification of surface brightness depressions (*X-ray cavities*) on noisy *Chandra* images of early-type galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained for producing pixel-wise cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities. The pipeline is further described in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457).
+[CADET](https://tomasplsek.github.io/CADET/) is a machine learning pipeline trained for identification of surface brightness depressions (*X-ray cavities*) on noisy *Chandra* images of early-type galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained for producing pixel-wise cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities. The pipeline is further described in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457).
 
 <!-- The pipeline was developed in order to improve the automation and accuracy of X-ray cavity detection and size-estimation.  -->
 The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an Inception layer, it was implemented using *Keras* library and it's development was inspired by [Fort et al. 2017](https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract) and [Secká 2019](https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411). For the clustering, we utilized is the *Scikit-learn* implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN, [Ester et al. 1996](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.121.9220)).
 
-![Architecture](figures/architecture.png)
+![Architecture](https://github.com/tomasplsek/CADET/raw/main/docs/figures/architecture.png)
 
-## Requirements
 
-For simple usage of the ***CADET***  pipeline, following libraries are required:\
-`matplotlib`\
-`astropy`\
-`numpy`\
-`scipy`\
-`sklearn`\
-`keras`\
-`tensorflow`
+## Python package
 
-If you want to re-train the network from scratch or generate training images, an additional library is required:\
-[`jax`](https://github.com/google/jax)
+A tutorial on how to use the pycadet package can be found here:
 
-## Usage
 
-<!-- ### Online CADET app
 
-***CADET*** pipeline can be used as a [web application](https://tomasplsek.github.io/CADET/) implemented 
-using [Streamlit](https://streamlit.io/) library and hosted on [HuggingFace Spaces](https://huggingface.co/spaces/Plsek/CADET).
-
-### Running CADET localy -->
-
-The ***CADET*** pipeline inputs either raw *Chandra* images in units of counts (numbers of captured photons) or exposure-corrected images. When using exposure-corrected images, images should be normalized by the lowest pixel value so all pixels are higher than or equal to 1. For images with many point sources, they should be filled with surrounding background level using Poisson statistics ([dmfilth](https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html) within [CIAO](https://cxc.harvard.edu/ciao/)).
-
-Convolutional part of the ***CADET*** pipeline can only input 128x128 images. As a part of the pipeline, input images are therefore being cropped to a size specified by parameter scale (size = scale * 128 pixels) and re-binned to 128x128 images. By default, images are probed on 4 different scales (1,2,3,4). The size of the image inputted into the pipeline therefore needs to at least 512x512 pixels (minimal input size differs if non-default scales are used) and images should be centred at the centre of the galaxy. The re-binning is performed using *Astropy* and *Numpy* libraries and can only handle integer binsizes. For floating point number binning, we recommend using [dmregrid](https://cxc.cfa.harvard.edu/ciao/ahelp/dmregrid.html) and applying ***CADET*** model manually (see Convolutional part).
-
-Before being decomposed by the DBSCAN algorithm, pixel-wise predictions produced by the convolutional part of the ***CADET*** pipeline need to be further thresholded. In order to simultaneously calibrate the volume error and false positive rate, we introduced two discrimination thresholds (for more info see [Plšek et al. 2023]()) and their default values are 0.4 and 0.6, respectively. Nevertheless, both discrimination thresholds are changeable and can be set to an arbitrary value between 0 and 1.
-
-The ***CADET*** pipeline is composed as a self-standing Python script (`CADET.py`), which can be run by simply calling it from a terminal using following arguments:\
-`filename` - string, name of the fits file\
-`scales` - list, list of size scales used to crop input images, optional (default: [1,2,3,4])\
-`threshold1` - float, between 0 and 1, calibrates volume error, optional (default: 0.4)\
-`threshold2` - float, between 0 and 1, calibrates false positive rate, optional (default: 0.6)
+CADET was released as a self-standing Python3 package and can be installed using pip:
 
 ```console
-$ python3 CADET.py filename [scales] [threshold1] [threshold2]
+$ pip3 install pycadet
 ```
 
-Example:
+To run `pycadet`, following libraries are required (should be installed alongside `pycadet`):
+```
+numpy
+scipy
+astropy
+matplotlib
+pyds9
+scikit-learn>=1.1
+tensorflow>=2.8
+```
 
-```console
-$ python3 CADET.py NGC5813.fits
-$ python3 CADET.py NGC5813.fits [1,2,3,4]
-$ python3 CADET.py NGC5813.fits [1,2,3,4] 0.5 0.9
+For Conda environments, it is recommended to install the dependencies beforehand as some can be tricky to install in an existing environment (especially `tensorflow`) and on some machines (especially new Macs). For machines with dedicated NVIDIA GPUs, `tensorflow-gpu` can be installed to allow the CADET model to leverage the GPU for faster inference.
+
+<!-- If you want to re-train the network from scratch or generate training images, an additional library is required:\
+[`jax`](https://github.com/google/jax) -->
+
+<!-- The CADET pipeline inputs either raw *Chandra* images in units of counts (numbers of captured photons) or exposure-corrected images. When using exposure-corrected images, images should be normalized by the lowest pixel value so all pixels are higher than or equal to 1. For images with many point sources, they should be filled with surrounding background level using Poisson statistics ([dmfilth](https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html) within [CIAO](https://cxc.harvard.edu/ciao/)).
+
+Convolutional part of the CADET pipeline can only input 128x128 images. As a part of the pipeline, input images are therefore being cropped to a size specified by parameter scale (size = scale * 128 pixels) and re-binned to 128x128 images. By default, images are probed on 4 different scales (1,2,3,4). The size of the image inputted into the pipeline therefore needs to at least 512x512 pixels (minimal input size differs if non-default scales are used) and images should be centred at the centre of the galaxy. The re-binning is performed using *Astropy* and *Numpy* libraries and can only handle integer binsizes. For floating point number binning, we recommend using [dmregrid](https://cxc.cfa.harvard.edu/ciao/ahelp/dmregrid.html) and applying CADET model manually (see Convolutional part).
+
+Before being decomposed by the DBSCAN algorithm, pixel-wise predictions produced by the convolutional part of the CADET pipeline need to be further thresholded. In order to simultaneously calibrate the volume error and false positive rate, we introduced two discrimination thresholds (for more info see [Plšek et al. 2023]()) and their default values are 0.4 and 0.6, respectively. Nevertheless, both discrimination thresholds are changeable and can be set to an arbitrary value between 0 and 1.
+
+
+```python
+from pycadet import rebin
+```
+
+```python
+data, wcs = rebin("NGC4649.fits", scale=2)
 ```
 
 The `CADET.py` script loads a FITS file specified by the `filename` argument, which is located in the same folder as the main `CADET.py` script. The script creates a folder of the same name as the FITS file, and saves corresponding pixel-wise as well as decomposed cavity predictions into the FITS format while also properly preserving the WCS coordinates. On the output, there is also a PNG file showing decomposed predictions for individual scales.
 
-The volumes of X-ray cavities are calculated under the assumption of rotational symmetry along the direction from the galactic centre towards the centre of the cavity (estimated as *center of mass*). The cavity depth in each point along that direction is then assumed to be equal to its width. Thereby produced 3D cavity models are stored in the `.npy` format and can be used for further caclulation (e.g. cavity energy estimationš)
+The volumes of X-ray cavities are calculated under the assumption of rotational symmetry along the direction from the galactic centre towards the centre of the cavity (estimated as *center of mass*). The cavity depth in each point along that direction is then assumed to be equal to its width. Thereby produced 3D cavity models are stored in the `.npy` format and can be used for further caclulation (e.g. cavity energy estimationš) -->
 
-![](figures/NGC5813.png)
+<!-- ![](docs/figures/NGC5813.png) -->
 
-### Convolutional part
+## DS9 Plugin
+
+The CADET pipeline can be also used as a [SAOImageDS9](ds9.si.edu/) plugin which is installed alongside with the `pycadet` Python package. To prevent conflits with e.g. CIAO instalation of DS9, we recommend installing `pycadet` into a system installation of Python3 rather than a Conda environment.
+
+After the installation, the CADET plugin should be available in the *Analysis* menu of DS9. After clicking on the *CADET* option, a new window will appear, where the user can set multiple options: whether the prediction should be averaged over multiple input images by dithering by +/- 1 pixel (*Dither*); and whether to decompose the prediction into individual cavities (*Decompose*). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one is used for volume error calibration and the second one for false positive rate calibration (for more info see [Plšek et al. 2023](https://arxiv.org/abs/2304.05457)).
+
+If the CADET plugin does not appear in the *Analysis* menu, it can be manually added by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADETPlugin.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADETPlugin.ds9.ans) (should be located in `~/.ds9/`). The plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
+
+![]()
+
+
+
+## Online CADET interface
+
+The CADET pipeline can also be accessed through a simple [web interface](https://huggingface.co/spaces/Plsek/CADET) hosted on HuggingFace Spaces.
+
+![](docs/figures/CADET_Huggingface.png)
+
+
+## Convolutional part
 
 <!-- [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tomasplsek/CADET/blob/main/CADET_example_colab.ipynb) -->
 
-The convolutional part of the pipeline can be used separately to produce raw pixel-wise predictions. Since the convolutional network was implemented using the functional *Keras* API, the architecture together with trained weights could have been stored in the HDF5 format (*CADET.hdf5*). Trained model can be therefore simply loaded using the `load_model` *Keras* function:
+The convolutional part of the pipeline can be used separately to produce raw pixel-wise predictions. Since the convolutional network was implemented using the functional *Keras* API, the architecture together with trained weights could have been stored in the HDF5 format ([`CADET.hdf5`](https://github.com/tomasplsek/CADET/raw/main/CADET.hdf5)). The trained model can be therefore simply loaded using the `load_model` *TensorFlow* function:
 
 ```python
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 
 model = load_model("CADET.hdf5")
 
 y_pred = model.predict(X)
 ```
 
-The CNN network inputs 128x128 images, however, to maintain the compatibility with *Keras*, the input needs to be reshaped as `X.reshape(1, 128, 128, 1)` for single image or as `X.reshape(-1, 128, 128, 1)` for multiple images.
+The input image 128x128 images. To maintain the compatibility with *Keras*, the input needs to be reshaped as `X.reshape(1, 128, 128, 1)` for single image or as `X.reshape(-1, 128, 128, 1)` for multiple images.
 
 Alternatively, the CNN model can be imported from HuggingFace's [model hub](https://huggingface.co/Plsek/CADET-v1):
 
@@ -102,7 +118,8 @@ clusters = DBSCAN(eps=1.5, min_samples=3).fit(data.T).labels_
 
 ## How to cite
 
-The ***CADET*** pipeline was originally developed as a part of my [diploma thesis](https://is.muni.cz/th/x68od/?lang=en) and was further described in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457). If you use the ***CADET***  pipeline in your research, please cite the following paper:
+<!-- The CADET pipeline is thoroughly described in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457) and was originally developed as a part of my [diploma thesis](https://is.muni.cz/th/x68od/?lang=en).  -->
+If you use the CADET  pipeline in your research, please cite the following paper [Plšek et al. 2023](https://arxiv.org/abs/2304.05457):
 
 ```
 @misc{plšek2023cavity,
@@ -117,7 +134,7 @@ The ***CADET*** pipeline was originally developed as a part of my [diploma thesi
 
 ## Todo
 
-The following improvements for the data generation and training process are currently planned:
+The following improvements to the data generation and training process are currently planned:
 
 - [ ] add other features (cold fronts, complex sloshing, point sources, jets)
 - [ ] use more complex cavity shapes (e.g. [Guo et al. 2015](https://arxiv.org/abs/1408.5018))
