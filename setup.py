@@ -128,7 +128,7 @@ long_description = (this_directory / "README.md").read_text()
 
 MAJOR = "0"
 MINOR = "1"
-MICRO = "55"
+MICRO = "56"
 version = "%s.%s.%s" % (MAJOR, MINOR, MICRO)
 
 setup(
