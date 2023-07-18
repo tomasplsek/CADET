@@ -15,7 +15,7 @@ The CADET pipeline was released as a self-standing Python3 package `pycadet`, wh
 $ pip3 install pycadet
 ```
 
-To install `pycadet`, the following libraries are required (should be installed automatically alongside `pycadet`):
+To `pycadet` package requieres the following libraries (should be installed automatically with the package):
 ```
 numpy
 scipy
@@ -26,9 +26,11 @@ scikit-learn>=1.1
 tensorflow>=2.8
 ```
 
-For Conda environments, it is recommended to install the dependencies beforehand as some can be tricky to install in an existing environment (especially `tensorflow`) and on some machines (especially new Macs). For machines with dedicated NVIDIA GPUs, `tensorflow-gpu` can be installed to allow the CADET model to leverage the GPU for faster inference.
+For Conda environments, it is recommended to install the dependencies beforehand as some of the packages can be tricky to install into an existing environment (especially `tensorflow`) and on some machines (especially new Macs). For machines with dedicated NVIDIA GPUs, `tensorflow-gpu` can be installed to allow the CADET model to leverage the GPU for faster inference.
 
-An exemplary notebook on how to use the `pycadet` package can be found here: &nbsp;&nbsp;<a target="_blank" href="https://colab.research.google.com/github/tomasplsek/CADET/blob/main/examples/CADET.ipynb">
+An exemplary notebook on how to use the `pycadet` package can be found here: 
+
+<a target="_blank" href="https://colab.research.google.com/github/tomasplsek/CADET/blob/main/examples/CADET.ipynb">
  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" style="margin-bottom:-4px"/>
 </a>
 
@@ -59,11 +61,11 @@ The volumes of X-ray cavities are calculated under the assumption of rotational 
 
 ## DS9 Plugin
 
-The CADET pipeline can be also used as a [SAOImageDS9](ds9.si.edu/) plugin which is installed alongside with the `pycadet` Python package. To prevent conflits with e.g. CIAO instalation of DS9, we recommend installing `pycadet` into a system installation of Python3 rather than a Conda environment.
+The CADET pipeline can also be used as a [SAOImageDS9](ds9.si.edu/) plugin which is installed together with the `pycadet` Python package. The CADET plugin requires SAOImageDS9 to be already installed on the system. To avoid conflicts (e.g. the CIAO installation of DS9), it is recommended to install `pycadet` using a system installation of Python3 rather than a Conda environment.
 
-After the installation, the CADET plugin should be available in the *Analysis* menu of DS9. After clicking on the *CADET* option, a new window will appear, where the user can set multiple options: whether the prediction should be averaged over multiple input images by dithering by +/- 1 pixel (*Dither*); and whether to decompose the prediction into individual cavities (*Decompose*). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one is used for volume error calibration and the second one for false positive rate calibration (for more info see [Plšek et al. 2023](https://arxiv.org/abs/2304.05457)).
+After the installation, the CADET plugin should be available in the *Analysis* menu of DS9. After clicking on the *CADET* option, a new window will appear, where the user can set several options: whether the prediction should be averaged over multiple input images by dithering by +/- 1 pixel (*Dither*); and whether the prediction should be decomposed into individual cavities (*Decompose*). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one is used for volume error calibration and the second one for false positive rate calibration (for more info see [Plšek et al. 2023](https://arxiv.org/abs/2304.05457)).
 
-If the CADET plugin does not appear in the *Analysis* menu, it can be manually added by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADETPlugin.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADETPlugin.ds9.ans) (should be located in `~/.ds9/`). The plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
+If the CADET plugin does not appear in the *Analysis* menu, it can be added manually by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADET.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans) (after the installation it should be located in `~/.ds9/`). The plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
 
 ![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif)
 

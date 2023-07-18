@@ -8,27 +8,31 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 
 
-DS9CADETPlugin_text = """CADET
-*
-bind c
-DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -th1 $threshold1 -th2 $threshold2  | $text
-#DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
+# DS9CADET_text = """CADET
+# *
+# bind c
+# DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -th1 $threshold1 -th2 $threshold2  | $text
+# #DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
 
-CADET
-*
-menu
-DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -th1 $threshold1 -th2 $threshold2  | $text
-#DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
+# CADET
+# *
+# menu
+# DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -th1 $threshold1 -th2 $threshold2  | $text
+# #DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
 
-param CADET
-dither checkbox {Dither} 0 {Dither the input region by +/- 1 pixel (increases execution time 8 times).}
-# bootstrap checkbox {Bootstrap} 0 {Boostrap individual counts of the input image (increases execution time N times).}
-# boot_n entry {Bootstrap N} 1 {Number of bootstrap iterations per single rotation-dithering configuration.}
-decompose checkbox {Decompose} 1 {Decompose raw cavity prediction into individual cavities.}
-threshold1 entry {Threshold1} 0.5 {Volume calibrating threshold (only applied if Decompose).}
-threshold2 entry {Threshold2} 0.9 {TP/FP calibrating threshold (only applied if Decompose).}
-endparam
-"""
+# param CADET
+# dither checkbox {Dither} 0 {Dither the input region by +/- 1 pixel (increases execution time 8 times).}
+# # bootstrap checkbox {Bootstrap} 0 {Boostrap individual counts of the input image (increases execution time N times).}
+# # boot_n entry {Bootstrap N} 1 {Number of bootstrap iterations per single rotation-dithering configuration.}
+# decompose checkbox {Decompose} 1 {Decompose raw cavity prediction into individual cavities.}
+# threshold1 entry {Threshold1} 0.5 {Volume calibrating threshold (only applied if Decompose).}
+# threshold2 entry {Threshold2} 0.9 {TP/FP calibrating threshold (only applied if Decompose).}
+# endparam
+# """
+
+
+this_directory = Path(__file__).parent
+DS9CADET_text = (this_directory / "DS9CADET.ds9.ans").read_text()
 
 def ReplaceStringInFile(path, string1, string2, path2=None):
     """Replaces string in a txt file"""
@@ -47,7 +51,7 @@ def ReplaceStringInFile(path, string1, string2, path2=None):
     fin.close()
     return
 
-def LoadDS9CADETPlugin():
+def LoadDS9CADET():
     """Load the plugin in DS9 parameter file
     """
 
@@ -57,12 +61,12 @@ def LoadDS9CADETPlugin():
         # try:
         if 1:
             home = os.environ['HOME']
-            DS9CADETPlugin_path = f"{home}/.ds9/DS9CADETPlugin.ds9.ans"
+            DS9CADET_path = f"{home}/.ds9/DS9CADET.ds9.ans"
 
             os.system(f"mkdir -p {home}/.ds9")
 
-            with open(DS9CADETPlugin_path, "w") as f:
-                f.write(DS9CADETPlugin_text)
+            with open(DS9CADET_path, "w") as f:
+                f.write(DS9CADET_text)
 
             version = os.popen("ds9 -version").read().replace("\n","").replace("ds9 ", "")            
             pref = f"{home}/.ds9/ds9.{version}.prf"
@@ -70,11 +74,11 @@ def LoadDS9CADETPlugin():
             if os.path.isfile(pref):
                 print("DS9 parameter file found")
                 print(pref)
-                ReplaceStringInFile(path=pref, string1="user4 {}", string2="user4 {%s}" % (DS9CADETPlugin_path))
+                ReplaceStringInFile(path=pref, string1="user4 {}", string2="user4 {%s}" % (DS9CADET_path))
             else:
                 print("DS9 parameter file not found. Creating new one.")
                 with open(pref, "w") as f:
-                    f.write("global panalysis\narray set panalysis { user2 {} autoload 1 user3 {} log 0 user4 {} user " + DS9CADETPlugin_path + " }")
+                    f.write("global panalysis\narray set panalysis { user2 {} autoload 1 user3 {} log 0 user4 {} user " + DS9CADET_path + " }")
                 os.chmod(pref, 0o644)
         # except:
         #     print(f"Encountered an error while opening DS9. The preferances file (e.g. ~.ds9/ds9.8.3.prf) might be corrupted.")
@@ -87,14 +91,14 @@ class PostDevelopCommand(develop):
         for package in requirements:
             pip_install(package)
         develop.run(self)
-        LoadDS9CADETPlugin()
+        LoadDS9CADET()
 
 class PostInstallCommand(install):
     def run(self):
         for package in requirements:
             pip_install(package)
         install.run(self)
-        LoadDS9CADETPlugin()
+        LoadDS9CADET()
 
 
 def pip_install(package_name):
@@ -113,11 +117,9 @@ entry_points = {}
 entry_points["console_scripts"] = ["DS9CADET = pycadet.DS9CADET:main"]
 
 data = {
-    # "." : ["requirements.txt"],
     "pycadet": [
         "DS9CADET",
         "*.hdf5",
-        "figures"
     ]
 }
 
@@ -126,7 +128,7 @@ long_description = (this_directory / "README.md").read_text()
 
 MAJOR = "0"
 MINOR = "1"
-MICRO = "53"
+MICRO = "54"
 version = "%s.%s.%s" % (MAJOR, MINOR, MICRO)
 
 setup(
@@ -143,5 +145,5 @@ setup(
     cmdclass={"install": PostInstallCommand, "develop": PostDevelopCommand},
     packages=find_packages(exclude=("docs", "training_testing", "examples",)),
     package_data=data,
-    include_package_data=True,
+    include_package_data=False,
 )

@@ -1,0 +1,20 @@
+CADET
+*
+bind c
+DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -th1 $threshold1 -th2 $threshold2  | $text
+#DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
+
+CADET
+*
+menu
+DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -th1 $threshold1 -th2 $threshold2  | $text
+#DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -dit $dither -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
+
+param CADET
+dither checkbox {Dither} 0 {Dither the input region by +/- 1 pixel (increases execution time 8 times).}
+# bootstrap checkbox {Bootstrap} 0 {Boostrap individual counts of the input image (increases execution time N times).}
+# boot_n entry {Bootstrap N} 1 {Number of bootstrap iterations per single rotation-dithering configuration.}
+decompose checkbox {Decompose} 1 {Decompose raw cavity prediction into individual cavities.}
+threshold1 entry {Threshold1} 0.5 {Volume calibrating threshold (only applied if Decompose).}
+threshold2 entry {Threshold2} 0.9 {TP/FP calibrating threshold (only applied if Decompose).}
+endparam
