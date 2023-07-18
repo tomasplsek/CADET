@@ -2,7 +2,6 @@
 
 [CADET](https://tomasplsek.github.io/CADET/) is a machine learning pipeline trained for identification of surface brightness depressions (*X-ray cavities*) on noisy *Chandra* images of early-type galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained for producing pixel-wise cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities. The pipeline is further described in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457).
 
-<!-- The pipeline was developed in order to improve the automation and accuracy of X-ray cavity detection and size-estimation.  -->
 The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an Inception layer, it was implemented using *Keras* library and it's development was inspired by [Fort et al. 2017](https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract) and [Secká 2019](https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411). For the clustering, we utilized is the *Scikit-learn* implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN, [Ester et al. 1996](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.121.9220)).
 
 ![Architecture](https://github.com/tomasplsek/CADET/raw/main/docs/figures/architecture.png)
@@ -10,17 +9,13 @@ The architecture of the convolutional network consists of 5 convolutional blocks
 
 ## Python package
 
-A tutorial on how to use the pycadet package can be found here:
-
-
-
-CADET was released as a self-standing Python3 package and can be installed using pip:
+The CADET pipeline was released as a self-standing Python3 package `pycadet`, which can be installed using pip:
 
 ```console
 $ pip3 install pycadet
 ```
 
-To run `pycadet`, following libraries are required (should be installed alongside `pycadet`):
+To install `pycadet`, the following libraries are required (should be installed automatically alongside `pycadet`):
 ```
 numpy
 scipy
@@ -32,6 +27,11 @@ tensorflow>=2.8
 ```
 
 For Conda environments, it is recommended to install the dependencies beforehand as some can be tricky to install in an existing environment (especially `tensorflow`) and on some machines (especially new Macs). For machines with dedicated NVIDIA GPUs, `tensorflow-gpu` can be installed to allow the CADET model to leverage the GPU for faster inference.
+
+An exemplary notebook on how to use the `pycadet` package can be found here: &nbsp;&nbsp;<a target="_blank" href="https://colab.research.google.com/github/tomasplsek/CADET/blob/main/examples/CADET.ipynb">
+ <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" style="margin-bottom:-4px"/>
+</a>
+
 
 <!-- If you want to re-train the network from scratch or generate training images, an additional library is required:\
 [`jax`](https://github.com/google/jax) -->
@@ -73,7 +73,7 @@ If the CADET plugin does not appear in the *Analysis* menu, it can be manually a
 
 The CADET pipeline can also be accessed through a simple [web interface](https://huggingface.co/spaces/Plsek/CADET) hosted on HuggingFace Spaces.
 
-![](docs/figures/CADET_Huggingface.png)
+![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/CADET_Huggingface.png)
 
 
 ## Convolutional part

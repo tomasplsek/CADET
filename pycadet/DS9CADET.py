@@ -193,9 +193,6 @@ def CADET(argv=[]):
     image, wcs = cutout.data, cutout.wcs
     hdu = fits.PrimaryHDU(image, header=wcs.to_header())
 
-    MIN = np.min(np.where(image == 0, 1, image))
-    if MIN < 1: image = image / MIN
-
     print("Rebinning the input region to 128x128 pixels.")
     image = image.reshape(min_size, scale, min_size, scale).sum(-1).sum(1)
 
