@@ -32,7 +32,7 @@ from setuptools.command.install import install
 
 
 this_directory = Path(__file__).parent
-DS9CADET_text = (this_directory / "DS9CADET.ds9.ans").read_text()
+DS9CADET_text = (this_directory / "pycadet/DS9CADET.ds9.ans").read_text()
 
 def ReplaceStringInFile(path, string1, string2, path2=None):
     """Replaces string in a txt file"""
@@ -128,7 +128,7 @@ long_description = (this_directory / "README.md").read_text()
 
 MAJOR = "0"
 MINOR = "1"
-MICRO = "54"
+MICRO = "55"
 version = "%s.%s.%s" % (MAJOR, MINOR, MICRO)
 
 setup(

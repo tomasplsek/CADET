@@ -2,7 +2,7 @@
 
 [CADET](https://tomasplsek.github.io/CADET/) is a machine learning pipeline trained for identification of surface brightness depressions (*X-ray cavities*) on noisy *Chandra* images of early-type galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained for producing pixel-wise cavity predictions and a DBSCAN clustering algorithm, which decomposes the predictions into individual cavities. The pipeline is further described in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457).
 
-The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an Inception layer, it was implemented using *Keras* library and it's development was inspired by [Fort et al. 2017](https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract) and [Secká 2019](https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411). For the clustering, we utilized is the *Scikit-learn* implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN, [Ester et al. 1996](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.121.9220)).
+The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an Inception layer, it was implemented using *Keras* library and it's development was inspired by [Fort et al. 2017](https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract) and [Secká 2019](https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411). For the clustering, we utilized is the *Scikit-learn* implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN).
 
 ![Architecture](https://github.com/tomasplsek/CADET/raw/main/docs/figures/architecture.png)
 
@@ -67,13 +67,13 @@ After the installation, the CADET plugin should be available in the *Analysis* m
 
 If the CADET plugin does not appear in the *Analysis* menu, it can be added manually by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADET.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans) (after the installation it should be located in `~/.ds9/`). The plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
 
-![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif)
+![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET_ffmpeg.gif)
 
 
 
 ## Online CADET interface
 
-The CADET pipeline can also be accessed through a simple [web interface](https://huggingface.co/spaces/Plsek/CADET) hosted on HuggingFace Spaces.
+Simplified version of the CADET pipeline can also be accessed through a <a href="https://huggingface.co/spaces/Plsek/CADET" target=_blank>web interface</a> hosted on HuggingFace Spaces.
 
 ![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/CADET_Huggingface.png)
 
