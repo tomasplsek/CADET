@@ -67,15 +67,15 @@ After the installation, the CADET plugin should be available in the *Analysis* m
 
 If the CADET plugin does not appear in the *Analysis* menu, it can be added manually by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADET.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans) (after the installation it should be located in `~/.ds9/`). The plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
 
-![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET_ffmpeg_faster.gif)
+![DS9 CADET plugin](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif)
 
 
 
 ## Online CADET interface
 
-Simplified version of the CADET pipeline can also be accessed through a <a href="https://huggingface.co/spaces/Plsek/CADET" target=_blank>web interface</a> hosted on HuggingFace Spaces.
+A simplified version of the CADET pipeline is available via a <a href="https://huggingface.co/spaces/Plsek/CADET" target=_blank>web interface</a> hosted on HuggingFace Spaces. Compared to the `pycadet` package this interface performs only a single thresholding of the raw pixel-wise prediction, which is easily adjustable using a slider. Furthermore, the input image should be centred on the galaxy centre and cropped to a square shape. It is also recommended to remove point sources from the image and fill them with the surrounding background level using Poisson statistics ([dmfilth](https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html) within [CIAO](https://cxc.harvard.edu/ciao/)).
 
-![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/CADET_Huggingface.png)
+![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/CADET_HF.png)
 
 
 ## Convolutional part
