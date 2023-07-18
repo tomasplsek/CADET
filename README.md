@@ -75,7 +75,7 @@ If the CADET plugin does not appear in the *Analysis* menu, it can be added manu
 
 A simplified version of the CADET pipeline is available via a <a href="https://huggingface.co/spaces/Plsek/CADET" target=_blank>web interface</a> hosted on HuggingFace Spaces. Compared to the `pycadet` package this interface performs only a single thresholding of the raw pixel-wise prediction, which is easily adjustable using a slider. Furthermore, the input image should be centred on the galaxy centre and cropped to a square shape. It is also recommended to remove point sources from the image and fill them with the surrounding background level using Poisson statistics ([dmfilth](https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html) within [CIAO](https://cxc.harvard.edu/ciao/)).
 
-![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/CADET_HF.png)
+![HuggingFace web interface](https://github.com/tomasplsek/CADET/raw/main/docs/figures/CADET_HF.gif)
 
 
 ## Convolutional part
