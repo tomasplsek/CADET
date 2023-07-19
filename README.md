@@ -36,7 +36,7 @@ For Conda environments, it is recommended to install the dependencies beforehand
 
 An exemplary notebook on how to use the `pycadet` package can be found here: 
 
-<a target="_blank" href="https://colab.research.google.com/github/tomasplsek/CADET/blob/main/examples/CADET.ipynb">
+<a target="_blank" href="https://colab.research.google.com/github/tomasplsek/CADET/blob/main/example/CADET.ipynb">
  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" style="margin-bottom:-4px"/>
 </a>
 
