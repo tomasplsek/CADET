@@ -43,7 +43,7 @@ An exemplary notebook on how to use the `pycadet` package can be found here:
 
 ## DS9 Plugin
 
-The CADET pipeline can also be used as a [SAOImageDS9](ds9.si.edu/) plugin which is installed together with the `pycadet` Python package. The CADET plugin requires that SAOImageDS9 is already installed on the system. To avoid conflicts (e.g. the CIAO installation of DS9), it is recommended to install `pycadet` using a system installation of Python3 rather than a Conda environment.
+The CADET pipeline can also be used as a [SAOImageDS9](https://ds9.si.edu/) plugin which is installed together with the `pycadet` Python package. The CADET plugin requires that SAOImageDS9 is already installed on the system. To avoid conflicts (e.g. the CIAO installation of DS9), it is recommended to install `pycadet` using a system installation of Python3 rather than a Conda environment.
 
 After the installation, the CADET plugin should be available in the *Analysis* menu of DS9. After clicking on the *CADET* option, a new window will appear, where the user can set several options: whether the prediction should be averaged over multiple input images by shifting by +/- 1 pixel (*Shift*); and whether the prediction should be decomposed into individual cavities (*Decompose*). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one (*Threshold1*) is used for volume error calibration and the second one (*Threshold2*) for false positive rate calibration (for more info see [Plšek et al. 2023](https://arxiv.org/abs/2304.05457)).
 
@@ -62,9 +62,7 @@ A simplified version of the CADET pipeline is available via a <a href="https://h
 
 ## Convolutional part
 
-<!-- [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tomasplsek/CADET/blob/main/CADET_example_colab.ipynb) -->
-
-The convolutional part of the pipeline can be used separately to produce raw pixel-wise predictions. Since the convolutional network was implemented using the functional *Keras* API, the architecture could have been stored together with the trained weights in the HDF5 format ([`CADET.hdf5`](https://github.com/tomasplsek/CADET/raw/main/CADET.hdf5)). The trained model can then simply be loaded using the `load_model` *TensorFlow* function:
+The convolutional part of the pipeline can be used separately to produce raw pixel-wise predictions. Since the convolutional network was implemented using the functional *Keras* API, the architecture could have been stored together with the trained weights in the HDF5 format ([`CADET.hdf5`](https://github.com/tomasplsek/CADET/raw/main/pycadet/CADET.hdf5)). The trained model can then simply be loaded using the `load_model` *TensorFlow* function:
 
 ```python
 from tensorflow.keras.models import load_model
@@ -86,23 +84,8 @@ model = from_pretrained_keras("Plsek/CADET-v1")
 y_pred = model.predict(X)
 ```
 
-<!-- Thus produced pixel-wise prediction needs to be further thresholded and decomposed into individual cavities using a DBSCAN clustering algorithm:
-
-```python
-import numpy as np
-from sklearn.cluster import DBSCAN
-
-y_pred = np.where(y_pred > threshold, 1, 0)
-
-x, y = y_pred.nonzero()
-data = np.array([x,y]).reshape(2, -1)
-
-clusters = DBSCAN(eps=1.5, min_samples=3).fit(data.T).labels_
-``` -->
-
 ## How to cite
 
-<!-- The CADET pipeline is thoroughly described in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457) and was originally developed as a part of my [diploma thesis](https://is.muni.cz/th/x68od/?lang=en).  -->
 If you use the CADET  pipeline in your research, please cite the following paper [Plšek et al. 2023](https://arxiv.org/abs/2304.05457):
 
 ```

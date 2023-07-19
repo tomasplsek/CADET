@@ -33,160 +33,94 @@
 
 <br class="shortbr">
 
-<!-- <h2>Web app</h2>
 
-<b><em>CADET</em></b> pipeline can be used as a <a href="online.html">web application</a> implemented 
-using <a href="https://streamlit.io/">Streamlit</a> library and hosted on <a href="https://huggingface.co/spaces/Plsek/CADET">HuggingFace Spaces</a>. -->
+<h2>Python package</h2>
 
-<h2><em>CADET.py</em> script</h2>
-<p>
-    The <b><em>CADET</em></b> pipeline is composed as a self-standing Python script (<a href="../CADET.py"><code>CADET.py</code></a>), which can 
-    be run by simply calling it from a terminal using following arguments:
+<p>The CADET pipeline has been released as a standalone Python3 package <a target=_blank href="https://pypi.org/project/pycadet/">pycadet</a>, which can be installed using pip:</p>
 
-    <br class="longbr">
-    <code>filename</code> - string, name of the fits file
-    <br class="shortbr">
-    <code>scales</code> - list, list of size scales used to crop input images, optional (default: [1,2,3,4])
-    <br class="shortbr">
-    <code>threshold1</code> - float, between 0 and 1, calibrates volume error, optional (default: 0.4)
-    <br class="shortbr">
-    <code>threshold2</code> - float, between 0 and 1, calibrates false positive rate, optional (default: 0.65)
-</p>
+<div class="python_code">
+    <code id="python_code">  
+        $ pip3 install pycadet
+    </code>
+</div>
+
+<p>or from source:</p>
+
+<div class="python_code">
+    <code id="python_code">  
+        $ pip3 install git+https://github.com/tomasplsek/CADET.git
+    </code>
+</div>
+
+<p>The <code>pycadet</code> package requires the following libraries (which should be installed automatically with the package):</p>
+<div class="python_code">
+    <code id="python_code">  
+        numpy<br>
+        scipy<br>
+        astropy<br>
+        matplotlib<br>
+        pyds9<br>
+        scikit-learn>=1.1<br>
+        tensorflow>=2.8
+    </code>
+</div>
+
+<p>For Conda environments, it is recommended to install the dependencies beforehand as some of the packages can be tricky to install in an existing environment (especially <code>tensorflow</code>) and on some machines (especially new Macs). For machines with dedicated NVIDIA GPUs, <code>tensorflow-gpu</code> can be installed to allow the CADET model to leverage the GPU for faster inference.</p>
+
+<p>An exemplary notebook on how to use the <code>pycadet</code> package can be found here:</p>
+
+<p><a target="_blank" href="https://colab.research.google.com/github/tomasplsek/CADET/blob/main/example/CADET.ipynb">
+ <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" style="margin-bottom:-4px"/>
+</a></p>
 
 <br>
 
-<div class="python_code">
-<code id="python_code">$  
-    python3 CADET.py filename [scales] [threshold1] [threshold2]
-</code>
-</div>
+<h2>DS9 Plugin</h2>
 
-<br class="longbr">
+<p>The CADET pipeline can also be used as a <a target=_blank href="https://ds9.si.edu/">SAOImageDS9</a> plugin which is installed together with the <code>pycadet</code> Python package. The CADET plugin requires that SAOImageDS9 is already installed on the system. To avoid conflicts (e.g. the CIAO installation of DS9), it is recommended to install <code>pycadet</code> using a system installation of Python3 rather than a Conda environment.</p>
 
-<b>Example: </b>
+<p>After the installation, the CADET plugin should be available in the <em>Analysis</em> menu of DS9. After clicking on the <em>CADET</em> option, a new window will appear, where the user can set several options: whether the prediction should be averaged over multiple input images by shifting by +/- 1 pixel (<em>Shift</em>); and whether the prediction should be decomposed into individual cavities (<em>Decompose</em>). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one (<em>Threshold1</em>) is used for volume error calibration and the second one (<em>Threshold2</em>) for false positive rate calibration (for more info see <a target=_blank href="https://arxiv.org/abs/2304.05457">Plšek et al. 2023</a>).</p>
 
-<br class="longbr">
+<p>If the CADET plugin does not appear in the <em>Analysis</em> menu, it can be added manually by opening <em>Edit</em> &gt; <em>Preferences</em> &gt; <em>Analysis</em> and adding a path to the following file <a target=_blank href="https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans">DS9CADET.ds9.ans</a> (after the installation it should be located in <code>~/.ds9/</code>). The plugin is inspired by the <a target=_blank href="https://github.com/vpicouet/pyds9plugin/tree/master">pyds9plugin</a> library.</p>
 
-<div class="python_code">
-    <code id="python_code">$ python3 CADET.py NGC5813.fits</code>
-    <br class="shortbr">
-    <code id="python_code">$ python3 CADET.py NGC5813.fits [1,2,3,4]</code>
-    <br class="shortbr">
-    <code id="python_code">$ python3 CADET.py NGC5813.fits [1,2,3,4] 0.5 0.9</code>
-</div>
+<p><img src="https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif" style="width:100%" alt="DS9 CADET plugin"></p>
 
-<br>
 
-<p>
-    The <b><em>CADET</em></b> pipeline inputs either raw <em>Chandra</em> images in units of counts 
-    (numbers of captured photons) or normalized background-subtracted and/or exposure-corrected images. 
-    When using e.g. corrected flux images, images should be normalized by the lowest pixel value so all 
-    pixels are higher than or equal to 1. For images with many point sources, the point sources should be filled 
-    with surrounding background level using Poisson statistics 
-    (<a target="_blank" href="https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html">dmfilth</a>
-    within <a target="_blank" href="https://cxc.harvard.edu/ciao/">CIAO</a>).
 
-    <br class="longbr">
+<h2>Online CADET interface</h2>
 
-    Convolutional part of the <b><em>CADET</em></b> pipeline can only input 128x128 images. As a part 
-    of the pipeline, input images are therefore being cropped to a size specified by parameter scale 
-    (size = scale * 128 pixels) and re-binned to 128x128 images. By default, images are probed on 4 
-    different scales (1,2,3,4). The size of the image inputted into the pipeline therefore needs to 
-    at least 512x512 pixels (minimal input size differs if non-default scales are used) and images 
-    should be centred at the centre of the galaxy. The re-binning is performed using <em>Astropy</em> and 
-    <em>Numpy</em> libraries and can only handle integer binsizes. For floating point number binning, we 
-    recommend using <a target="_blank" href="https://cxc.cfa.harvard.edu/ciao/ahelp/dmregrid.html">dmregrid</a> 
-    and applying <b><em>CADET</em></b> model manually (see Convolutional part).
+<p>A simplified version of the CADET pipeline is available via a <a target=_blank href="https://huggingface.co/spaces/Plsek/CADET" target=_blank>web interface</a> hosted on HuggingFace Spaces. The input image should be centred on the galaxy centre and cropped to a square shape. It is also recommended to remove point sources from the image and fill them with the surrounding background level using Poisson statistics (<a target=_blank href="https://cxc.cfa.harvard.edu/ciao/ahelp/dmfilth.html">dmfilth</a> within <a target=_blank href="https://cxc.harvard.edu/ciao/">CIAO</a>). Furthermore, compared to the <code>pycadet</code> package, the web interface performs only a single thresholding of the raw pixel-wise prediction, which is easily adjustable using a slider.</p>
 
-    <br class="longbr">
+<p><img src="https://github.com/tomasplsek/CADET/raw/main/docs/figures/CADET_HF.gif" style="width:100%" alt="HuggingFace web interface"></p>
 
-    Before being decomposed by the DBSCAN algorithm, pixel-wise predictions produced by the convolutional 
-    part of the <b><em>CADET</em></b> pipeline need to be further thresholded. In order to simultaneously 
-    calibrate the volume error and false positive rate, we introduced two discrimination thresholds (for 
-    more info see <a target="_blank" href="https://arxiv.org/abs/2304.05457">[Plšek2023]</a>) with default values of 0.4 and 
-    0.6. Nevertheless, both discrimination thresholds are changeable and can be set to an 
-    arbitrary value between 0 and 1.
-
-    <br class="longbr">
-
-    The <code>CADET.py</code> script loads a FITS file located in the 
-    same folder which is specified by the <code>filename</code> argument, it creates a folder of the same name as the FITS file, 
-    and saves corresponding pixel-wise as well as decomposed cavity predictions into the FITS 
-    format while also properly preserving the WCS coordinates. On the output, there is also a 
-    PNG file showing decomposed predictions for individual scales.
-
-    <br class="longbr">
-</p>
-
-<img src="figures/NGC5813.png" style="width:99%">
-
-<p class="figure_caption">
-    <b>Figure 1:</b> Decomposed cavity predictions for galaxy NGC5813 probed at 4 different scales: 128x128 pixels, 256x256 pixels, 
-    384x384 pixels, and 512x512 pixels.
-</p>
-
-<br class="minibr">
 
 <h2>Convolutional part</h2>
 
-<p>
-    The convolutional part can be used separately to produce raw pixel-wise predictions. Since the convolutional 
-    network was implemented using the functional <em>Keras</em> API, the architectures together with 
-    trained weights could have been stored in the HDF5 format (<a href="../CADET.hdf5"><code>CADET.hdf5</code></a>). 
-    The trained models can be simply loaded using the <code>load_model</code> <em>Keras</em> function.
-</p>
+<p>The convolutional part of the pipeline can be used separately to produce raw pixel-wise predictions. Since the convolutional network was implemented using the functional <em>Keras</em> API, the architecture could have been stored together with the trained weights in the HDF5 format (<a target=_blank href="https://github.com/tomasplsek/CADET/raw/main/pycadet/CADET.hdf5">CADET.hdf5</a>). The trained model can then simply be loaded using the <code>load_model</code> <em>TensorFlow</em> function:</p>
 
 <div class="python_code">
-    <code id="python_code">
-    from keras.models import load_model<br>
-    <br>
-    model = load_model("CADET.hdf5")<br>
-    <br>
-    y_pred = model.predict(X)
+    <code id="python_code">  
+        from tensorflow.keras.models import load_model<br><br>
+
+        model = load_model("CADET.hdf5")<br><br>
+        
+        y_pred = model.predict(X)
     </code>
 </div>
 
-<p>
-    The network inputs 128x128 images. However, to maintain the compatibility with <em>Keras</em>, 
-    the input needs to be reshaped as <code>X.reshape(1, 128, 128, 1)</code> for single image or as 
-    <code>X.reshape(len(X), 128, 128, 1)</code> for multiple images.
 
-    <br class="shortbr">
 
-    <br class="shortbr">
+<p>The raw CADET model only inputs 128x128 images. Furthermore, to maintain the compatibility with <em>Keras</em>, the input needs to be reshaped as <code>X.reshape(1, 128, 128, 1)</code> for single image or as <code>X.reshape(-1, 128, 128, 1)</code> for multiple images.</p>
 
-    Alternatively, the CNN model can be imported from HuggingFace's 
-    <a target="_blank" href="https://huggingface.co/Plsek/CADET-v1">model hub</a>:
-</p>
+<p>Alternatively, the CADET model can be imported from HuggingFace's <a target=_blank href="https://huggingface.co/Plsek/CADET-v1">model hub</a>:</p>
 
 <div class="python_code">
-    <code id="python_code">
-    from huggingface_hub import from_pretrained_keras<br>
-    <br>
-    model = from_pretrained_keras("Plsek/CADET-v1")<br>
-    <br>
-    y_pred = model.predict(X)
-    </code>
-</div>
-
-<br class="shortbr">
-
-<p>
-    Thus produced pixel-wise prediction needs to be further thresholded and decomposed into individual 
-    cavities using a DBSCAN clustering algorithm:
-</p>
-
-<div class="python_code">
-    <code id="python_code">
-    import numpy as np
-    from sklearn.cluster import DBSCAN<br>
-    <br>
-    y_pred = np.where(y_pred > threshold, 1, 0)<br>
-    <br>
-    x, y = y_pred.nonzero()<br>
-    data = np.array([x,y]).reshape(2, -1)<br>
-    <br>
-    clusters = DBSCAN(eps=1.5, min_samples=3).fit(data.T).labels_
+    <code id="python_code">  
+        from huggingface_hub import from_pretrained_keras<br>
+        <br>
+        model = from_pretrained_keras("Plsek/CADET-v1")<br>
+        <br>
+        y_pred = model.predict(X)
     </code>
 </div>
 
