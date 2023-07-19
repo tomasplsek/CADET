@@ -110,16 +110,16 @@ def CADET(argv=[]):
 
     # Parse arguments
     parser = CreateParser(get_name_doc(),path=True)
-    parser.add_argument('-dit', '--dither', help='Dither the input region by +/- 1 pixel (increases execution time ~9 times).', default='0', metavar='')
+    parser.add_argument('-shift', '--shift', help='Shift the input region by +/- 1 pixel (increases execution time ~9 times).', default='0', metavar='')
     # parser.add_argument('-b', '--bootstrap', help='Boostrap the input image (increases execution time ~n times).', default='0', metavar='')
-    # parser.add_argument('-n', '--bootstrap_n', help='Number of bootstrap iterations per single rotation-dithering configuration.', default=1, type=int, metavar='')
+    # parser.add_argument('-n', '--bootstrap_n', help='Number of bootstrap iterations per single rotation-shifting configuration.', default=1, type=int, metavar='')
     parser.add_argument('-dec', '--decompose', help='Decompose raw cavity prediction into individual cavities.', default='0', metavar='')
     parser.add_argument('-th1', '--threshold1', help='Volume calibrating threshold.', default=0.5, type=float, metavar='')
     parser.add_argument('-th2', '--threshold2', help='TP/FP calibrating threshold.', default=0.9, type=float, metavar='')
     args = parser.parse_args_modif(argv,required=True)
 
     decompose = bool(int(args.decompose))
-    dither = bool(int(args.dither))
+    shift = bool(int(args.shift))
     # bootstrap = bool(int(args.bootstrap))
     # N_bootstrap = args.bootstrap_n
     threshold1 = args.threshold1
@@ -127,7 +127,7 @@ def CADET(argv=[]):
     # method = 4
     pixel_size = 0.492
 
-    min_size = 130 if dither else 128
+    min_size = 130 if shift else 128
 
     # Load current DS9 session
     d = DS9n(args.xpapoint)
@@ -197,7 +197,7 @@ def CADET(argv=[]):
     image = image.reshape(min_size, scale, min_size, scale).sum(-1).sum(1)
 
     # rotations = [0,1,2,3]
-    # if dither:
+    # if shift:
     #     DX = np.array([0,0,0,1,1,1,-1,-1,-1])
     #     DY = np.array([0,1,-1,0,1,-1,0,1,-1])
     #     # DX = np.array([0,0,0,0,0,1,1,1,1,1,-1,-1,-1,-1,-1,2,2,2,-2,-2,-2])
@@ -268,7 +268,7 @@ def CADET(argv=[]):
     # y_pred = np.sum(y_pred, axis=0) / N_bootstrap / len(rotations)
 
     print("Applying CADET pipeline.")
-    y_pred = make_prediction(image, dither=dither) #, bootstrap=bootstrap, N_bootstrap=N_bootstrap)
+    y_pred = make_prediction(image, shift=shift) #, bootstrap=bootstrap, N_bootstrap=N_bootstrap)
 
     y_pred = zoom(y_pred, (scale, scale))
 

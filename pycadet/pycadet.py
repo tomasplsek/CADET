@@ -44,9 +44,9 @@ from astropy.utils.exceptions import AstropyWarning
 warnings.simplefilter('ignore', category=AstropyWarning)
 
 
-def rebin(fname, scale, ra="", dec="", dither=False):
+def rebin(fname, scale, ra="", dec="", shift=False):
     '''
-    Crops & rebins image to 128x128 (130x130 if dither=True).
+    Crops & rebins image to 128x128 (130x130 if shift=True).
 
     This rebin function only handles integer scale factors. 
     If required, for floating point scale factors (0.5, 1.5...), use dmregrid in CIAO (https://cxc.cfa.harvard.edu/ciao/).
@@ -66,7 +66,7 @@ def rebin(fname, scale, ra="", dec="", dither=False):
     else:
         x0, y0 = shape / 2, shape / 2
 
-    min_size = 128 if not dither else 130
+    min_size = 128 if not shift else 130
 
     # CROP
     size = min_size * scale
@@ -106,11 +106,11 @@ def rebin(fname, scale, ra="", dec="", dither=False):
 #     return sampled_data
 
 
-def make_prediction(image, dither=False): #, bootstrap=False, N_bootstrap=10):
+def make_prediction(image, shift=False): #, bootstrap=False, N_bootstrap=10):
     '''
     Apply CADET to an input image.
-    Input image must be 128x128 pixels (130x130 if dither=True).
-    Dithering makes the prediction more robust by shifting the center of the image by +/- 1 pixel.
+    Input image must be 128x128 pixels (130x130 if shift=True).
+    Shifting makes the prediction more robust by shifting the center of the image by +/- 1 pixel.
     Bootstraping makes the prediction more robust by re-sampling the counts of the input image with replacement.
     Returns pixel-wise prediction (128x128 pixels.
     '''
@@ -124,11 +124,11 @@ def make_prediction(image, dither=False): #, bootstrap=False, N_bootstrap=10):
 
     s1, s2 = image.shape
     if s1 != s2: raise ValueError(f"Input image must be square. Current shape: {s1}x{s2}.")
-    if (not dither) & (s1 != 128): raise ValueError("Input image must be 128x128 if dither=False.")
-    if (dither) & (s1 != 130): raise ValueError("Input image must be 130x130 if dither=True.")
+    if (not shift) & (s1 != 128): raise ValueError("Input image must be 128x128 if shift=False.")
+    if (shift) & (s1 != 130): raise ValueError("Input image must be 130x130 if shift=True.")
 
     rotations = [0,1,2,3]
-    if dither:
+    if shift:
         DX = np.array([0,0,0,1,1,1,-1,-1,-1])
         DY = np.array([0,1,-1,0,1,-1,0,1,-1])
         # DX = np.array([0,0,0,0,0,1,1,1,1,1,-1,-1,-1,-1,-1,2,2,2,-2,-2,-2])
@@ -260,7 +260,7 @@ def make_3D_cavity(cavity):
     return cube
 
 
-def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, dither=False): #, N_bootstrap=1, bootstrap=False):
+def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False): #, N_bootstrap=1, bootstrap=False):
     print("\033[92m---- Running CADET ----\033[0m")
 
     print(f"Reading file: {galaxy}")
@@ -298,7 +298,7 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, dither=Fals
 
         image, wcs = rebin(f"{galaxy}.fits", scale, ra=ra, dec=dec)
 
-        y_pred = make_prediction(image, dither=dither) #, bootstrap=bootstrap, N_bootstrap=N_bootstrap)
+        y_pred = make_prediction(image, shift=shift) #, bootstrap=bootstrap, N_bootstrap=N_bootstrap)
 
         ccd = CCDData(y_pred, unit="adu", wcs=wcs)
         ccd.write(f"{galaxy}/predictions/{galaxy}_{scale}.fits", overwrite=True)
