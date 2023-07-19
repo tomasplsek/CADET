@@ -49,11 +49,7 @@ After the installation, the CADET plugin should be available in the *Analysis* m
 
 If the CADET plugin does not appear in the *Analysis* menu, it can be added manually by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADET.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans) (after the installation it should be located in `~/.ds9/`). The plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
 
-<!-- ![DS9 CADET plugin](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif) -->
-<div style="display:flex; justify-content:center;">
-      <img src="https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif" style="width:90%;">
-</div>
-
+![DS9 CADET plugin](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif)
 
 ## Online CADET interface
 
