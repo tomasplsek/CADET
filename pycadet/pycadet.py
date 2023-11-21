@@ -47,9 +47,28 @@ warnings.simplefilter('ignore', category=AstropyWarning)
 def rebin(fname, scale, ra="", dec="", shift=False):
     '''
     Crops & rebins image to 128x128 (130x130 if shift=True).
-
     This rebin function only handles integer scale factors. 
     If required, for floating point scale factors (0.5, 1.5...), use dmregrid in CIAO (https://cxc.cfa.harvard.edu/ciao/).
+
+    Parameters:
+    -----------
+    fname : str
+        Path to the input image.
+    scale : int
+        Scale factor. The input image will be cropped to 128*scale x 128*scale pixels.
+    ra : str, optional
+        RA of the center of the image. If not specified, the center of the image will be used.
+    dec : str, optional
+        DEC of the center of the image. If not specified, the center of the image will be used.
+    shift : bool, optional
+        If True, the center of the image will be shifted by +/- 1 pixel. This is makes the predictions more robust.
+
+    Returns:
+    --------
+    data : 2D array
+        Re-binned image.
+    wcs : WCS object
+        WCS of the re-binned image.
     '''
 
     with fits.open(fname) as file:
@@ -113,6 +132,18 @@ def make_prediction(image, shift=False): #, bootstrap=False, N_bootstrap=10):
     Shifting makes the prediction more robust by shifting the center of the image by +/- 1 pixel.
     Bootstraping makes the prediction more robust by re-sampling the counts of the input image with replacement.
     Returns pixel-wise prediction (128x128 pixels.
+
+    Parameters:
+    -----------
+    image : 2D array
+        Input image.
+    shift : bool, optional
+        If True, the center of the image will be shifted by +/- 1 pixel. This is makes the predictions more robust.
+
+    Returns:
+    --------
+    y_pred : 2D array
+        Averaged pixel-wise prediction (128x128 pixels).
     '''
 
     # Load CADET model
@@ -133,7 +164,7 @@ def make_prediction(image, shift=False): #, bootstrap=False, N_bootstrap=10):
         DY = np.array([0,1,-1,0,1,-1,0,1,-1])
         # DX = np.array([0,0,0,0,0,1,1,1,1,1,-1,-1,-1,-1,-1,2,2,2,-2,-2,-2])
         # DY = np.array([0,1,-1,2,-2,0,1,-1,2,-2,0,1,-1,2,-2,0,1,-1,0,1,-1])
-        W = 1 / (1 + (DX**2 + DY**2)**0.5)
+        W = 1 / (1 + DX**2 + DY**2)**0.5
     else:
         DX = np.array([0])
         DY = np.array([0])
@@ -177,7 +208,7 @@ def make_prediction(image, shift=False): #, bootstrap=False, N_bootstrap=10):
             y_pred[x,:,:] += prediction * w / sum(W)
             x += 1
 
-    # y_pred = np.std(y_pred, axis=0) / N_bootstrap / len(rotations)
+    # y_std = np.std(y_pred, axis=0) / len(rotations) / N_bootstrap
     y_pred = np.sum(y_pred, axis=0) / len(rotations) # / N_bootstrap
 
     return y_pred
@@ -188,6 +219,22 @@ def decompose(pred, th1=0.5, th2=0.7, amin=10):
     Decomposes the pixel-wise prediction into individual cavities.
     Applies the higher discrimination threshold and minimal area cut.
     Returns a list of cavities (128x128 matrices).
+
+    Parameters:
+    -----------
+    pred : 2D array
+        Pixel-wise prediction (128x128 pixels).
+    th1 : float, optional
+        Volume calibrating threshold (float between 0 and 1).
+    th2 : float, optional
+        TP/FP calibrating threshold (float between 0 and 1).
+    amin : int, optional
+        Minimal area of a cavity in pixels.
+
+    Returns:
+    --------
+    cavities : array
+        array of cavity predictions (128x128 matrices).
     '''
 
     pred = np.where(pred > th1, pred, 0)
@@ -223,6 +270,16 @@ def make_3D_cavity(cavity):
     '''
     Assuming rotational symmetry, this function creates a 3D representation of the cavity.
     The 3D cube can be saved as a .npy file and further be used to calculate total cavity energy (E=4pV).
+    
+    Parameters:
+    -----------
+    cavity : 2D array
+        Pixel-wise prediction of a single cavity (128x128 pixels).
+
+    Returns:
+    --------
+    cube : 3D array
+        3D representation of the cavity (128x128x128).
     '''
 
     # DE-ROTATES CAVITY
@@ -261,6 +318,35 @@ def make_3D_cavity(cavity):
 
 
 def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False): #, N_bootstrap=1, bootstrap=False):
+    '''
+    CADET automated script.
+
+    Parameters:
+    -----------
+    galaxy : str
+        Path to the input image.
+    scales : list, optional
+        List of scale factors. The input image will be cropped to 128*scale x 128*scale pixels.
+    ra : str, optional
+        RA of the center of the image. If not specified, the center of the image will be used.
+    dec : str, optional
+        DEC of the center of the image. If not specified, the center of the image will be used.
+    th1 : float, optional
+        Volume calibrating threshold (float between 0 and 1).
+    th2 : float, optional
+        TP/FP calibrating threshold (float between 0 and 1).
+    shift : bool, optional
+        If True, the center of the image will be shifted by +/- 1 pixel. This is makes the predictions more robust.
+
+    Returns:
+    --------
+    Saves the following files:
+    - {galaxy}/predictions/{galaxy}_{scale}.fits - raw CADET predictions
+    - {galaxy}/decomposed/{galaxy}_{scale}_{i+1}.fits - predictions decomposed into individual cavities
+    - {galaxy}/cubes/{galaxy}_{scale}_{i+1}.npy - 3D representations of cavities
+    - {galaxy}/{galaxy}.png - plot of the input image with detected cavities
+    '''
+
     print("\033[92m---- Running CADET ----\033[0m")
 
     print(f"Reading file: {galaxy}")
@@ -296,7 +382,7 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     for i,scale in enumerate(scales):
         print(f"{scale*128}x{scale*128} pixels:", end="    ")
 
-        image, wcs = rebin(f"{galaxy}.fits", scale, ra=ra, dec=dec)
+        image, wcs = rebin(f"{galaxy}.fits", scale, ra=ra, dec=dec, shift=shift)
 
         y_pred = make_prediction(image, shift=shift) #, bootstrap=bootstrap, N_bootstrap=N_bootstrap)
 
@@ -337,7 +423,7 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
         cavs = decompose(y_pred, th1, th2, amin=10)
 
         # PLOT CONTOURS
-        if cavs != []: 
+        if cavs.size > 0: 
             ax.contour(cavs.sum(axis=0), colors=["white","yellow"], linewidths=1.3, levels=[th1, th2], zorder=2, norm=Normalize(0,1))
 
         for i, cav in enumerate(cavs):
