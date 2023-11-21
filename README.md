@@ -84,16 +84,16 @@ y_pred = model.predict(X)
 
 ## How to cite
 
-If you use the CADET  pipeline in your research, please cite the following paper [Plšek et al. 2023](https://arxiv.org/abs/2304.05457):
+If you use the CADET  pipeline in your research, please cite the following paper [Plšek et al. 2023](https://academic.oup.com/mnras/article/527/2/3315/7339785) ([arXiv](https://arxiv.org/abs/2304.05457)):
 
 ```
-@misc{plšek2023cavity,
-      title={CAvity DEtection Tool (CADET): Pipeline for automatic detection of X-ray cavities in hot galactic and cluster atmospheres}, 
-      author={Tomáš Plšek and Norbert Werner and Martin Topinka and Aurora Simionescu},
-      year={2023},
-      eprint={2304.05457},
-      archivePrefix={arXiv},
-      primaryClass={astro-ph.HE}
+@ARTICLE{2023MNRAS.tmp.3233P,
+       author = {{Pl{\v{s}}ek}, T. and {Werner}, N. and {Topinka}, M. and {Simionescu}, A.},
+        title = "{CAvity DEtection Tool (CADET): Pipeline for detection of X-ray cavities in hot galactic and cluster atmospheres}",
+      journal = {\mnras},
+         year = 2023,
+        month = nov,
+          doi = {10.1093/mnras/stad3371},
 }
 ```
 
