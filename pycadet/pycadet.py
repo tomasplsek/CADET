@@ -1,8 +1,10 @@
 # basic libraries
 import os
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
+from IPython.display import display
 from scipy.ndimage import center_of_mass, rotate
 
 # Astropy
@@ -15,6 +17,12 @@ from astropy.wcs import WCS
 # import ML libraries
 from sklearn.cluster import DBSCAN
 
+# Filter warnings
+import warnings
+from astropy.utils.exceptions import AstropyWarning
+warnings.simplefilter('ignore', category=AstropyWarning)
+
+# Configure GPU
 def configure_GPU():
     # # DISABLE GPU
     # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -37,11 +45,6 @@ def configure_GPU():
     else: print("No GPUs detected. Using a CPU.\n")
 
 configure_GPU()
-
-# Filter warnings
-import warnings
-from astropy.utils.exceptions import AstropyWarning
-warnings.simplefilter('ignore', category=AstropyWarning)
 
 
 def rebin(fname, scale, ra="", dec="", shift=False):
@@ -74,7 +77,7 @@ def rebin(fname, scale, ra="", dec="", shift=False):
     with fits.open(fname) as file:
         wcs0 = WCS(file[0].header if isinstance(file, fits.HDUList) else file.header)
         data0 = file[0].data if isinstance(file, fits.HDUList) else file.data
-        shape = data0.shape[0]
+        shape = data0.shape
 
     if (ra != "") and (dec != ""):
         if ":" in ra: ra = Angle(ra, unit="hourangle").degree
@@ -83,9 +86,9 @@ def rebin(fname, scale, ra="", dec="", shift=False):
         else: dec = float(dec)
         x0, y0 = wcs0.wcs_world2pix(ra, dec, 0)
     else:
-        x0, y0 = shape / 2, shape / 2
+        x0, y0 = shape[0] / 2, shape[1] / 2
 
-    min_size = 128 if not shift else 130
+    min_size = 130 if shift else 128
 
     # CROP
     size = min_size * scale
@@ -266,7 +269,7 @@ def decompose(pred, th1=0.5, th2=0.7, amin=10):
     return np.array(cavities)
 
 
-def make_3D_cavity(cavity):
+def make_3D_cavity(cavity, rotate_back=False):
     '''
     Assuming rotational symmetry, this function creates a 3D representation of the cavity.
     The 3D cube can be saved as a .npy file and further be used to calculate total cavity energy (E=4pV).
@@ -285,7 +288,7 @@ def make_3D_cavity(cavity):
     # DE-ROTATES CAVITY
     cen = center_of_mass(cavity)
     phi = np.arctan2(cen[0]-63.5, cen[1]-63.5)
-    cavity = rotate(cavity, phi*180/np.pi, reshape=False, prefilter=False)
+    cavity = rotate(cavity, phi*180/np.pi, reshape=False, prefilter=True)
     cavity = np.where(cavity > 0.1, 1, 0)
 
     # ESTIMATES MEANS & WIDTHS IN EACH COLUMN
@@ -297,7 +300,7 @@ def make_3D_cavity(cavity):
         for i,r in enumerate(rang):
             if r > 0 and x == 0: x = i
             elif x != 0 and r == 0: 
-                widths.append(max([(i-x)/2, 0]))
+                widths.append(max([(i-x)/2-1, 0]))
                 means.append((x+i)/2)
                 indices.append(n)
                 x = 0
@@ -311,8 +314,9 @@ def make_3D_cavity(cavity):
         cube[:,:,i] += sliced
 
     # ROTATES BACK
-    cube = rotate(cube, -phi*180/np.pi, axes=(0,2), reshape=False, prefilter=False)
-    cube = np.where(cube > 0.1, 1, 0)
+    if rotate_back:
+        cube = rotate(cube, -phi*180/np.pi, axes=(0,2), reshape=False, prefilter=True)
+        cube = np.where(cube > 0.1, 1, 0)
 
     return cube
 
@@ -359,6 +363,7 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     print(f"\nOriginal image size: {image0.shape[0]}x{image0.shape[1]} pixels")
     print(f"Selected scales: {str(scales)}")
 
+    # Print RA & DEC, if not specified use the center of the image
     if (ra != "") and (dec != ""):
         print(f"RA:  {ra} hours")
         print(f"DEC: {dec} degrees")
@@ -371,23 +376,31 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
         print(f"DEC: {DEC} degrees")
 
     # MAKE DIRECTORIES
-    # print(f"Creating directories for galaxy {galaxy}:\n{galaxy}/\n  \u251Cpredicitons/ - raw CADET predictions\n  \u251Cdecomposed/ - predictions decomposed into individual cavities\n  \u2514cubes/ - 3D representations of cavities")
+    # print(f"Creating directories {galaxy}:\n{galaxy}/\n  \u251Cpredicitons/ - raw CADET predictions\n  \u251Cdecomposed/ - predictions decomposed into individual cavities\n  \u2514cubes/ - 3D representations of cavities")
     print(f"\nCreating directories:\n{galaxy}/\n  \u251C predicitons/\n  \u251C decomposed/\n  \u2514 cubes/")
     os.system(f"mkdir -p {galaxy} {galaxy}/predictions {galaxy}/decomposed {galaxy}/cubes")
 
+    # Blank dataframe for saving results
+    index = pd.MultiIndex(levels=[[],[]], codes=[[],[]], names=['scale', 'cavity'])
+    df = pd.DataFrame(index=index, columns=["area [px²]", "area [arcsec²]", "volume [px³]", "volume [arcsec³] (rotated)", "volume [arcsec³] (from area)"])
+
+    # Create matplotlib figure
     N = len(scales)
     fig, axs = plt.subplots(1, N, figsize=(N*3.2,5))
 
-    print("\nProcessing images with CADET:")
+    print("\nProcessing the image on following scales:")
     for i,scale in enumerate(scales):
-        print(f"{scale*128}x{scale*128} pixels:", end="    ")
+        size = 128 * scale
+        print(f"{size} pixels:", end="  ")
 
         image, wcs = rebin(f"{galaxy}.fits", scale, ra=ra, dec=dec, shift=shift)
+
+        angular_scale = wcs.pixel_scale_matrix[1,1] * 3600
 
         y_pred = make_prediction(image, shift=shift) #, bootstrap=bootstrap, N_bootstrap=N_bootstrap)
 
         ccd = CCDData(y_pred, unit="adu", wcs=wcs)
-        ccd.write(f"{galaxy}/predictions/{galaxy}_{scale}.fits", overwrite=True)
+        ccd.write(f"{galaxy}/predictions/{galaxy}_{size}.fits", overwrite=True)
 
         # PLOTTING
         ax = axs[i]
@@ -422,6 +435,8 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
         # CLUSTERING
         cavs = decompose(y_pred, th1, th2, amin=10)
 
+        print(f"detected {len(cavs)} {'cavity' if len(cavs) == 1 else 'cavities'}")
+
         # PLOT CONTOURS
         if cavs.size > 0: 
             ax.contour(cavs.sum(axis=0), colors=["white","yellow"], linewidths=1.3, levels=[th1, th2], zorder=2, norm=Normalize(0,1))
@@ -430,14 +445,33 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
             ax.text(*center_of_mass(cav)[::-1], i+1, color="w", ha="center", va="center", fontsize=14) #, weight="bold")
 
             ccd = CCDData(cav, unit="adu", wcs=wcs)
-            ccd.write(f"{galaxy}/decomposed/{galaxy}_{scale}_{i+1}.fits", overwrite=True)
+            ccd.write(f"{galaxy}/decomposed/{galaxy}_{size}_{i+1}.fits", overwrite=True)
 
-            cube = make_3D_cavity(cav)
-            np.save(f"{galaxy}/cubes/{galaxy}_{scale}_{i+1}.npy", cube)
+            cube = make_3D_cavity(cav, rotate_back=False)
+            np.save(f"{galaxy}/cubes/{galaxy}_{size}_{i+1}.npy", cube)
 
-        print(f"detected {len(cavs)} {'cavity' if len(cavs) == 1 else 'cavities'}")
+            area = np.sum(cav)
+            area_arcsec = area * angular_scale**2
+            volume = np.sum(cube)
+            volume_arcsec = volume * angular_scale**3
+            volume_from_area = 4 * np.pi / 3 * (area_arcsec / np.pi)**(3/2)
+
+            df.loc[(size, i+1), "area [px²]"] = round(area)
+            df.loc[(size, i+1), "area [arcsec²]"] = round(area_arcsec)
+            df.loc[(size, i+1), "volume [px³]"] = round(volume)
+            df.loc[(size, i+1), "volume [arcsec³] (rotated)"] = round(volume_arcsec)
+            df.loc[(size, i+1), "volume [arcsec³] (from area)"] = round(volume_from_area)
+
+    # Save & display results
+    print(f"\nSaving results:\n{galaxy}/cavity_properties.txt")
+    print("\narea [px²] and volume [px³] are expressed in units of binned pixels")
+    print("volume [arcsec³] (rotated) - calculated assuming rotational symmetry along the axis from galaxy center to cavity center")
+    print("volume [arcsec³] (from area) - calculated from area assuming a sphere V ≈ 0.75 A^(3/2)\n")
+
+    df.to_csv(f"{galaxy}/cavity_properties.txt", sep=",", float_format="%.2f")
+    display(df)
 
     fig.tight_layout()
-    fig.savefig(f"{galaxy}/{galaxy}.png", bbox_inches="tight", dpi=200)
+    fig.savefig(f"{galaxy}/{galaxy}.png", bbox_inches="tight", dpi=250)
     # plt.close(fig)
 
