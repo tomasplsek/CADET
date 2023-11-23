@@ -456,11 +456,11 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
             volume_arcsec = volume * angular_scale**3
             volume_from_area = 4 * np.pi / 3 * (area_arcsec / np.pi)**(3/2)
 
-            df.loc[(size, i+1), "area [px²]"] = round(area)
-            df.loc[(size, i+1), "area [arcsec²]"] = round(area_arcsec)
-            df.loc[(size, i+1), "volume [px³]"] = round(volume)
-            df.loc[(size, i+1), "volume [arcsec³] (rotated)"] = round(volume_arcsec)
-            df.loc[(size, i+1), "volume [arcsec³] (from area)"] = round(volume_from_area)
+            df.loc[(f"{size} pixels", i+1), "area [px²]"] = round(area)
+            df.loc[(f"{size} pixels", i+1), "area [arcsec²]"] = round(area_arcsec)
+            df.loc[(f"{size} pixels", i+1), "volume [px³]"] = round(volume)
+            df.loc[(f"{size} pixels", i+1), "volume [arcsec³] (rotated)"] = round(volume_arcsec)
+            df.loc[(f"{size} pixels", i+1), "volume [arcsec³] (from area)"] = round(volume_from_area)
 
     # Save & display results
     print(f"\nSaving results:\n{galaxy}/cavity_properties.txt")
@@ -469,7 +469,7 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     print("volume [arcsec³] (from area) - calculated from area assuming a sphere V ≈ 0.75 A^(3/2)\n")
 
     df.to_csv(f"{galaxy}/cavity_properties.txt", sep=",", float_format="%.2f")
-    display(df)
+    display(df.T)
 
     fig.tight_layout()
     fig.savefig(f"{galaxy}/{galaxy}.png", bbox_inches="tight", dpi=250)
