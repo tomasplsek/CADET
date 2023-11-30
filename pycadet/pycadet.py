@@ -321,7 +321,7 @@ def make_3D_cavity(cavity, rotate_back=False):
     return cube
 
 
-def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False): #, N_bootstrap=1, bootstrap=False):
+def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False, verbose=1): #, N_bootstrap=1, bootstrap=False):
     '''
     CADET automated script.
 
@@ -351,33 +351,38 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     - {galaxy}/{galaxy}.png - plot of the input image with detected cavities
     '''
 
-    print("\033[92m---- Running CADET ----\033[0m")
+    if verbose: 
+        print("\033[92m---- Running CADET ----\033[0m")
 
-    print(f"Reading file: {galaxy}")
+        print(f"Reading file: {galaxy}")
     galaxy = galaxy.replace(".fits", "")
 
     # Load image
     hdu0 = fits.open(f"{galaxy}.fits")
     image0 = hdu0[0].data
     wcs0 = WCS(hdu0[0].header)
-    print(f"\nOriginal image size: {image0.shape[0]}x{image0.shape[1]} pixels")
-    print(f"Selected scales: {str(scales)}")
+    if verbose:
+        print(f"\nOriginal image size: {image0.shape[0]}x{image0.shape[1]} pixels")
+        print(f"Selected scales: {str(scales)}")
 
     # Print RA & DEC, if not specified use the center of the image
     if (ra != "") and (dec != ""):
-        print(f"RA:  {ra} hours")
-        print(f"DEC: {dec} degrees")
+        if verbose:
+            print(f"RA:  {ra} hours")
+            print(f"DEC: {dec} degrees")
     else:
         RA, DEC = wcs0.wcs_pix2world(image0.shape[0]/2, image0.shape[1]/2, 0)
         RA = Angle(RA, unit="degree").to_string(unit=u.hour, sep=':', precision=2)
         DEC = Angle(DEC, unit="degree").to_string(unit=u.degree, sep=':', precision=2)
-        print("\nRA & DEC not specified.\nUsing the center of the image:")
-        print(f"RA:  {RA} hours")
-        print(f"DEC: {DEC} degrees")
+        if verbose:
+            print("\nRA & DEC not specified.\nUsing the center of the image:")
+            print(f"RA:  {RA} hours")
+            print(f"DEC: {DEC} degrees")
 
     # MAKE DIRECTORIES
-    # print(f"Creating directories {galaxy}:\n{galaxy}/\n  \u251Cpredicitons/ - raw CADET predictions\n  \u251Cdecomposed/ - predictions decomposed into individual cavities\n  \u2514cubes/ - 3D representations of cavities")
-    print(f"\nCreating directories:\n{galaxy}/\n  \u251C predicitons/\n  \u251C decomposed/\n  \u2514 cubes/")
+    if verbose:
+        # print(f"Creating directories {galaxy}:\n{galaxy}/\n  \u251Cpredicitons/ - raw CADET predictions\n  \u251Cdecomposed/ - predictions decomposed into individual cavities\n  \u2514cubes/ - 3D representations of cavities")
+        print(f"\nCreating directories:\n{galaxy}/\n  \u251C predicitons/\n  \u251C decomposed/\n  \u2514 cubes/")
     os.system(f"mkdir -p {galaxy} {galaxy}/predictions {galaxy}/decomposed {galaxy}/cubes")
 
     # Blank dataframe for saving results
@@ -388,10 +393,11 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     N = len(scales)
     fig, axs = plt.subplots(1, N, figsize=(N*3.2,5))
 
-    print("\nProcessing the image on following scales:")
+    if verbose: print("\nProcessing the image on following scales:")
     for i,scale in enumerate(scales):
         size = 128 * scale
-        print(f"{size} pixels:", end="  ")
+        if verbose:
+            print(f"{size} pixels:", end="  ")
 
         image, wcs = rebin(f"{galaxy}.fits", scale, ra=ra, dec=dec, shift=shift)
 
@@ -435,7 +441,8 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
         # CLUSTERING
         cavs = decompose(y_pred, th1, th2, amin=10)
 
-        print(f"detected {len(cavs)} {'cavity' if len(cavs) == 1 else 'cavities'}")
+        if verbose:
+            print(f"detected {len(cavs)} {'cavity' if len(cavs) == 1 else 'cavities'}")
 
         # PLOT CONTOURS
         if cavs.size > 0: 
@@ -463,13 +470,15 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
             df.loc[(f"{size} pixels", i+1), "volume [arcsec³] (from area)"] = round(volume_from_area)
 
     # Save & display results
-    print(f"\nSaving results:\n{galaxy}/cavity_properties.txt")
-    print("\narea [px²] and volume [px³] are expressed in units of binned pixels")
-    print("volume [arcsec³] (rotated) - calculated assuming rotational symmetry along the axis from galaxy center to cavity center")
-    print("volume [arcsec³] (from area) - calculated from area assuming a sphere V ≈ 0.75 A^(3/2)\n")
+    if verbose:
+        print(f"\nSaving results:\n{galaxy}/cavity_properties.txt")
+        print("\narea [px²] and volume [px³] are expressed in units of binned pixels")
+        print("volume [arcsec³] (rotated) - calculated assuming rotational symmetry along the axis from galaxy center to cavity center")
+        print("volume [arcsec³] (from area) - calculated from area assuming a sphere V ≈ 0.75 A^(3/2)\n")
 
     df.to_csv(f"{galaxy}/cavity_properties.txt", sep=",", float_format="%.2f")
-    display(df.T)
+    if verbose:
+        display(df.T)
 
     fig.tight_layout()
     fig.savefig(f"{galaxy}/{galaxy}.png", bbox_inches="tight", dpi=250)
