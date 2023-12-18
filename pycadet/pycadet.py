@@ -44,9 +44,6 @@ def configure_GPU():
     if len(gpus) > 0: print(f"{len(gpus)} GPUs detected.\n")
     else: print("No GPUs detected. Using a CPU.\n")
 
-configure_GPU()
-
-
 def rebin(fname, scale, ra="", dec="", shift=False):
     '''
     Crops & rebins image to 128x128 (130x130 if shift=True).
@@ -325,6 +322,7 @@ def make_3D_cavity(cavity, rotate_back=False):
 
 
 def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False, verbose=1): #, N_bootstrap=1, bootstrap=False):
+    configure_GPU()
     '''
     CADET automated script.
 
@@ -489,3 +487,6 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     fig.savefig(f"{galaxy}/{galaxy}.png", bbox_inches="tight", dpi=250)
     # plt.close(fig)
 
+
+if __name__ == "__main__":
+    configure_GPU()

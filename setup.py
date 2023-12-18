@@ -10,15 +10,14 @@ from setuptools.command.install import install
 
 DS9CADET_text = """CADET
 *
-bind c
-DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -th1 $threshold1 -th2 $threshold2  | $text
-#DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
-
-CADET
-*
 menu
 DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -th1 $threshold1 -th2 $threshold2  | $text
 #DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
+
+Volume
+*
+menu
+DS9CADET Volume -x $xpa_method  $param(Volume); -nm $name -rs $redshift -sc $scale | $text
 
 param CADET
 shift checkbox {Shift} 0 {Shift the input region by +/- 1 pixel (increases execution time 8 times).}
@@ -27,6 +26,12 @@ shift checkbox {Shift} 0 {Shift the input region by +/- 1 pixel (increases execu
 decompose checkbox {Decompose} 1 {Decompose raw cavity prediction into individual cavities.}
 threshold1 entry {Threshold1} 0.5 {Volume calibrating threshold (only applied if Decompose).}
 threshold2 entry {Threshold2} 0.9 {TP/FP calibrating threshold (only applied if Decompose).}
+endparam
+
+param Volume
+name entry {Name} {name} {Prefix for saved files. (No files are saved if not changed)}
+redshift entry {Redshift} 0.1 {Redshift of the object.}
+scale entry {Scale} 0 {Scale in units of pc/arcsec (https://ned.ipac.caltech.edu/).}
 endparam
 """
 
@@ -65,7 +70,8 @@ def LoadDS9CADET():
             with open(DS9CADET_path, "w") as f:
                 f.write(DS9CADET_text)
 
-            version = os.popen("ds9 -version").read().replace("\n","").replace("ds9 ", "")            
+            version = os.popen("ds9 -version").read().replace("\n","").replace("ds9 ", "")
+            version = ".".join(version.split(".")[0:2])
             pref = f"{home}/.ds9/ds9.{version}.prf"
 
             if os.path.isfile(pref):
@@ -126,7 +132,7 @@ long_description = (this_directory / "README.md").read_text()
 
 MAJOR = "0"
 MINOR = "1"
-MICRO = "3"
+MICRO = "64"
 version = "%s.%s.%s" % (MAJOR, MINOR, MICRO)
 
 setup(

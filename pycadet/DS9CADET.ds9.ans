@@ -1,7 +1,7 @@
-CADET
-*
-bind c
-DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -th1 $threshold1 -th2 $threshold2  | $text
+#CADET
+#*
+#bind c
+#DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -th1 $threshold1 -th2 $threshold2  | $text
 #DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
 
 CADET
@@ -9,6 +9,11 @@ CADET
 menu
 DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -th1 $threshold1 -th2 $threshold2  | $text
 #DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
+
+Volume
+*
+button
+DS9CADET Volume -x $xpa_method  | $text
 
 param CADET
 shift checkbox {Shift} 0 {Shift the input region by +/- 1 pixel (increases execution time 8 times).}

@@ -1,6 +1,5 @@
-import argparse, sys
-from pycadet import make_prediction, make_3D_cavity
-
+import sys
+import argparse
 
 ######################## THIS PART OF CODE IS FROM PYDS9PLUGIN ########################
 ####################### https://github.com/vpicouet/pyds9plugin #######################
@@ -91,6 +90,8 @@ def CADET(argv=[]):
     from astropy.wcs import WCS
     from astropy.nddata import Cutout2D
     from sklearn.cluster import DBSCAN
+
+    from pycadet import make_prediction, make_3D_cavity
 
     # Parse arguments
     parser = CreateParser(get_name_doc(),path=True)
@@ -278,11 +279,116 @@ def CADET(argv=[]):
     return
 
 
+def Volume(argv=[]):
+    import numpy as np
+    from astropy.wcs import WCS
+    from astropy import units as u
+    from astropy.coordinates import Angle
+    from astropy.cosmology import FlatLambdaCDM
+
+    # Parse arguments
+    parser = CreateParser(get_name_doc(),path=True)
+    parser.add_argument('-nm', '--name', help='Prefix for saved files. (No files are saved if not changed)', default='name', metavar='')
+    parser.add_argument('-rs', '--redshift', help='Redshift of the object.', default=0.1, type=float, metavar='')
+    parser.add_argument('-sc', '--scale', help='Scale in units of pc/arcsec (https://ned.ipac.caltech.edu/). Calculated from redshift if not specified.\n', default=100.0, type=float, metavar='')
+    args = parser.parse_args_modif(argv,required=True)
+
+    name = args.name
+    redshift = float(args.redshift)
+    scale = float(args.scale)
+
+    cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+    if scale == 0: scale = cosmo.kpc_proper_per_arcmin(redshift) / u.arcsec * u.arcmin / u.kpc * u.pc / 60 * 1000
+
+    # Load current DS9 session
+    d = DS9n(args.xpapoint)
+
+    # Load current image
+    hdu = d.get_pyfits()[0]
+    wcs = WCS(hdu.header)
+    fname = d.get('file')
+
+    # Load current region file
+    d.set("regions format ds9")
+    d.set("regions system image")
+    region = d.get('regions')
+    lines = region.split("\n")
+    ellipse = None
+    for line in lines:
+        if "ellipse" in line:
+            ellipse = line
+            break
+
+    if ellipse is None:
+        print("No ellipse region found.", end=" ")
+        return
+
+    print("Using selected ellipse region.")
+    print(ellipse,"\n")
+
+    X, Y, a, b, phi = ellipse.split("(")[1][:-1].split(",")
+
+    ra, dec = wcs.all_pix2world(float(X), float(Y), 0)
+
+    factor = wcs.pixel_scale_matrix[1,1] * 3600
+
+    a_arcsec = float(a) * factor
+    b_arcsec = float(b) * factor
+    phi = float(phi)
+
+    a_kpc = a_arcsec * scale / 1000
+    b_kpc = b_arcsec * scale / 1000
+
+    A_arcsec = np.pi * a_arcsec * b_arcsec
+    A_kpc = np.pi * a_kpc * b_kpc
+
+    print("Redshift:", redshift)
+    print(f"Scale: {scale.value:.3g} {scale.unit}")
+    print(f"Major axis: {a_arcsec:.2f} arcsec ({a_kpc.value:.2f} kpc)")
+    print(f"Minor axis: {b_arcsec:.2f} arcsec ({b_kpc.value:.2f} kpc)")
+    print(f"Area: {A_arcsec:.3g} arcsec² ({A_kpc.value:.3g} kpc²)")
+
+    volume_arcsec1 = 4/3 * np.pi * a_arcsec**2 * b_arcsec
+    volume_arcsec2 = 4/3 * np.pi * a_arcsec * b_arcsec**2
+    volume_kpc1 = 4/3 * np.pi * a_kpc**2 * b_kpc
+    volume_kpc2 = 4/3 * np.pi * a_kpc * b_kpc**2
+
+    # unit = "kpc³" if volume_kpc1.value < 1e7 else "Mpc³"
+    # fac = 1 if volume_kpc1.value < 1e7 else 1e-9
+
+    volume_arcsec1, volume_arcsec2 = min([volume_arcsec1, volume_arcsec2]), max([volume_arcsec1, volume_arcsec2])
+    volume_kpc1, volume_kpc2 = min([volume_kpc1, volume_kpc2]), max([volume_kpc1, volume_kpc2])
+
+    # print(f"Volume: {volume_arcsec1:.3g} - {volume_arcsec2:.3g} arcsec³ ({volume_kpc1.value*fac:.3g} - {volume_kpc2.value*fac:.3g} {unit})")
+    print(f"Volume: {volume_arcsec1:.3g} - {volume_arcsec2:.3g} arcsec³ ({volume_kpc1.value:.3g} - {volume_kpc2.value:.3g} kpc³)")
+
+    if name != "name":
+        with open(name+".reg", "w") as file:
+            print(f"\nWriting region file: {name}.reg.")
+            RA = Angle(ra, unit=u.deg).to_string(unit=u.hour, sep=":")
+            DEC = Angle(dec, unit=u.deg).to_string(unit=u.deg, sep=":")
+            RA, DEC = RA[:min([len(RA),13])], DEC[:min([len(RA),13])]
+            file.write(f"ellipse({RA},{DEC},{a_arcsec:.3f}\",{b_arcsec:.3f}\",{phi:.3f})\n")
+
+        with open(name+".txt", "w") as file:
+            print(f"Writing results to text file: {name}.txt.")
+            file.write(f"Filename: {fname}\n")
+            file.write(f"Redshift: {redshift}\n")
+            file.write(f"Scale: {scale.value:.3g} {scale.unit}\n")
+            file.write(f"Major axis: {a_arcsec:.2f} arcsec ({a_kpc.value:.2f} kpc)\n")
+            file.write(f"Minor axis: {b_arcsec:.2f} arcsec ({b_kpc.value:.2f} kpc)\n")
+            file.write(f"Area: {A_arcsec:.3g} arcsec² ({A_kpc.value:.3g} kpc²)\n")
+            file.write(f"Volume: {volume_arcsec1:.3g} - {volume_arcsec2:.3g} arcsec³ ({volume_kpc1.value:.3g} - {volume_kpc2.value:.3g} kpc³)")
+
+    return
+
+
 def main():
     """Main function where the arguments are defined and the other functions called
     """
 
-    DictFunction = {"CADET" : CADET}
+    DictFunction = {"CADET" : CADET,
+                    "Volume" : Volume}
 
     function = sys.argv[1]
 
