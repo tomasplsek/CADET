@@ -1,6 +1,6 @@
 # *Cavity Detection Tool* (CADET)
 
-[CADET](https://tomasplsek.github.io/CADET/) is a machine learning pipeline trained to identify of surface brightness depressions (*X-ray cavities*) in noisy *Chandra* images of early-type galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained to produce pixel-wise cavity predictions and a DBSCAN clustering algorithm that decomposes the predictions into individual cavities. The pipeline is described in detail in [Plšek et al. 2023](https://arxiv.org/abs/2304.05457).
+[CADET](https://tomasplsek.github.io/CADET/) is a machine learning pipeline trained to identify of surface brightness depressions (*X-ray cavities*) in noisy *Chandra* images of early-type galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained to produce pixel-wise cavity predictions and a DBSCAN clustering algorithm that decomposes the predictions into individual cavities. The pipeline is described in detail in [Plšek et al. 2023](https://academic.oup.com/mnras/article/527/2/3315/7339785).
 
 The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an Inception layer, it was implemented using the *Keras* library and its development was inspired by [Fort et al. 2017](https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract) and [Secká 2019](https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411). For the clustering, we used is the *Scikit-learn* implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN).
 
