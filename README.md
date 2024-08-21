@@ -23,13 +23,13 @@ $ pip3 install git+https://github.com/tomasplsek/CADET.git
 
 The `pycadet` package requires the following libraries (which should be installed automatically with the package):
 ```
+keras<=2.12
+tensorflow
 numpy
 scipy
 astropy
 matplotlib
-pyds9
 scikit-learn>=1.1
-tensorflow>=2.8
 ```
 
 For Conda environments, it is recommended to install the dependencies beforehand as some of the packages can be tricky to install in an existing environment (especially `tensorflow`) and on some machines (especially new Macs). For machines with dedicated NVIDIA GPUs, `tensorflow-gpu` can be installed to allow the CADET model to leverage the GPU for faster inference.

@@ -1,9 +1,9 @@
 from pathlib import Path
 from setuptools import setup, find_packages
 
-requirements = ["keras == 2.12",
-                "tensorflow-cpu == 2.12",
-                "scikit-learn >= 1.2",
+requirements = ["keras <= 2.15",
+                "tensorflow",
+                "scikit-learn",
                 "numpy >=1.8",
                 "pandas",
                 "matplotlib", # >= 3.1.1",
@@ -18,7 +18,7 @@ long_description = (this_directory / "README.md").read_text()
 
 MAJOR = "0"
 MINOR = "2"
-MICRO = "0"
+MICRO = "7"
 version = "%s.%s.%s" % (MAJOR, MINOR, MICRO)
 
 setup(

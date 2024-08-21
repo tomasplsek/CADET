@@ -505,7 +505,7 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
                 ax.quiver(center[0], center[1], np.cos(angle)*a, np.sin(angle)*a, 
                         color='cyan', scale=1, scale_units='xy', angles='xy', zorder=1)
                 ax.quiver(center[0], center[1], -np.sin(angle)*b, np.cos(angle)*b, 
-                        color='cyan', scale=1, scale_units='xy', angles='xy', zorder=1)
+                        color='white', scale=1, scale_units='xy', angles='xy', zorder=1)
 
             ccd = CCDData(cav, unit="adu", wcs=wcs)
             ccd.write(f"{galaxy}/decomposed/{galaxy}_{size}_{i+1}.fits", overwrite=True)
