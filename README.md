@@ -23,7 +23,7 @@ $ pip3 install git+https://github.com/tomasplsek/CADET.git
 
 The `pycadet` package requires the following libraries (which should be installed automatically with the package):
 ```
-keras<=2.12
+keras<=2.15
 tensorflow
 numpy
 scipy
