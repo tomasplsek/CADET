@@ -11,11 +11,13 @@ from scipy.ndimage import center_of_mass, rotate
 from astropy.io import fits
 from astropy.nddata import Cutout2D, CCDData
 from astropy.coordinates import Angle
+from astropy.convolution import convolve, Gaussian2DKernel as Gauss
 from astropy import units as u
 from astropy.wcs import WCS
 
 # import ML libraries
 from sklearn.cluster import DBSCAN
+from sklearn.decomposition import PCA
 
 # Filter warnings
 import warnings
@@ -43,6 +45,10 @@ def configure_GPU():
     gpus = list_physical_devices('GPU')
     if len(gpus) > 0: print(f"{len(gpus)} GPUs detected.\n")
     else: print("No GPUs detected. Using a CPU.\n")
+
+# configure_GPU()
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
 
 def rebin(fname, scale, ra="", dec="", shift=False):
     '''
@@ -147,7 +153,7 @@ def make_prediction(image, shift=False): #, bootstrap=False, N_bootstrap=10):
     '''
 
     # Load CADET model
-    from tensorflow.keras.models import load_model
+    from keras.models import load_model
     path = os.path.dirname(__file__)
     model = load_model(f'{path}/CADET.hdf5')
 
@@ -266,6 +272,35 @@ def decompose(pred, th1=0.5, th2=0.7, amin=10):
     return np.array(cavities)
 
 
+def rotangle_and_ellip(cavity):
+    """
+    Calculate the rotation angle and ellipticity of a cavity by performing 
+    Principal Component Analysis (PCA) using Singular Value Decomposition (SVD).
+
+    Parameters:
+    -----------
+    cavity: numpy array
+        The cavity represented as a numpy array.
+
+    Returns:
+    --------
+    angle: float
+        The rotation angle of the cavity.
+    e: float
+        The ellipticity of the cavity.
+    """
+
+    points = np.array(cavity.nonzero()).T
+    pca = PCA(n_components=2)
+    pca.fit(points)
+    pc1, pc2 = pca.components_
+    
+    angle = np.arctan2(pc1[1], pc1[0])
+    r = pca.singular_values_
+    e = (max(r)-min(r))/max(r)
+    
+    return angle, e
+
 
 def make_3D_cavity(cavity, rotate_back=False):
     '''
@@ -320,9 +355,7 @@ def make_3D_cavity(cavity, rotate_back=False):
     return cube
 
 
-
-def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False, verbose=1): #, N_bootstrap=1, bootstrap=False):
-    configure_GPU()
+def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False, plot_smooth=False, plot_arrows=False, verbose=1): #, N_bootstrap=1, bootstrap=False):
     '''
     CADET automated script.
 
@@ -342,19 +375,23 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
         TP/FP calibrating threshold (float between 0 and 1).
     shift : bool, optional
         If True, the center of the image will be shifted by +/- 1 pixel. This is makes the predictions more robust.
+    plot_smooth : bool, optional
+        If True, the input image will be smoothed before plotting.
+    plot_arrows : bool, optional
+        If True, the major and minor axis of the cavity will be plotted as arrows.
     verbose : int, optional
-        If 0, no output will be printed. If 1, basic output will be printed.
+        If 0, no output will be printed. If 1, the output will be printed.
 
     Returns:
     --------
-    Saves the following files:
+    Creates the following files:
     - {galaxy}/predictions/{galaxy}_{scale}.fits - raw CADET predictions
     - {galaxy}/decomposed/{galaxy}_{scale}_{i+1}.fits - predictions decomposed into individual cavities
     - {galaxy}/cubes/{galaxy}_{scale}_{i+1}.npy - 3D representations of cavities
     - {galaxy}/{galaxy}.png - plot of the input image with detected cavities
     '''
 
-    if verbose == 2:
+    if verbose: 
         print("\033[92m---- Running CADET ----\033[0m")
 
         print(f"Reading file: {galaxy}")
@@ -364,42 +401,42 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     hdu0 = fits.open(f"{galaxy}.fits")
     image0 = hdu0[0].data
     wcs0 = WCS(hdu0[0].header)
-    if verbose == 2:
+    if verbose:
         print(f"\nOriginal image size: {image0.shape[0]}x{image0.shape[1]} pixels")
         print(f"Selected scales: {str(scales)}")
 
     # Print RA & DEC, if not specified use the center of the image
     if (ra != "") and (dec != ""):
-        if verbose == 2:
+        if verbose:
             print(f"RA:  {ra} hours")
             print(f"DEC: {dec} degrees")
     else:
         RA, DEC = wcs0.wcs_pix2world(image0.shape[0]/2, image0.shape[1]/2, 0)
         RA = Angle(RA, unit="degree").to_string(unit=u.hour, sep=':', precision=2)
         DEC = Angle(DEC, unit="degree").to_string(unit=u.degree, sep=':', precision=2)
-        if verbose == 2:
+        if verbose:
             print("\nRA & DEC not specified.\nUsing the center of the image:")
             print(f"RA:  {RA} hours")
             print(f"DEC: {DEC} degrees")
 
     # MAKE DIRECTORIES
-    if verbose == 2:
+    if verbose:
         # print(f"Creating directories {galaxy}:\n{galaxy}/\n  \u251Cpredicitons/ - raw CADET predictions\n  \u251Cdecomposed/ - predictions decomposed into individual cavities\n  \u2514cubes/ - 3D representations of cavities")
         print(f"\nCreating directories:\n{galaxy}/\n  \u251C predicitons/\n  \u251C decomposed/\n  \u2514 cubes/")
     os.system(f"mkdir -p {galaxy} {galaxy}/predictions {galaxy}/decomposed {galaxy}/cubes")
 
     # Blank dataframe for saving results
     index = pd.MultiIndex(levels=[[],[]], codes=[[],[]], names=['scale', 'cavity'])
-    df = pd.DataFrame(index=index, columns=["area [px²]", "area [arcsec²]", "volume [px³]", "volume [arcsec³] (rotated)", "volume [arcsec³] (from area)"])
+    df = pd.DataFrame(index=index)
 
     # Create matplotlib figure
     N = len(scales)
     fig, axs = plt.subplots(1, N, figsize=(N*3.2,5))
 
-    if verbose == 2: print("\nProcessing the image on following scales:")
+    if verbose: print("\nProcessing the image on following scales:")
     for i,scale in enumerate(scales):
         size = 128 * scale
-        if verbose == 2:
+        if verbose:
             print(f"{size} pixels:", end="  ")
 
         image, wcs = rebin(f"{galaxy}.fits", scale, ra=ra, dec=dec, shift=shift)
@@ -418,10 +455,13 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
                     fontsize=14, va='top', ha='left') #, weight='bold')
 
         # CONVOLVE IMAGE
-        # image = convolve(image, boundary = "extend", nan_treatment="fill",
-        #                  kernel = Gauss(x_stddev = 1, y_stddev = 1))
+        if plot_smooth:
+            image = convolve(np.log10(image+1), boundary = "extend", nan_treatment="fill",
+                            kernel = Gauss(x_stddev = 1, y_stddev = 1))
+        else:
+            image = np.log10(image+1)
 
-        ax.imshow(np.log10(image+1), origin="lower", cmap="viridis", zorder=1) #, norm=LogNorm())
+        ax.imshow(image, origin="lower", cmap="viridis", zorder=1) #, norm=LogNorm())
 
         # PLOT SCALE LINE
         x0, y0 = 0.2, 0.085
@@ -442,9 +482,9 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
         ax.set_yticks([])
 
         # CLUSTERING
-        cavs = decompose(y_pred, th1, th2, amin=10)
+        cavs = decompose(y_pred, th1, th2, amin=12)
 
-        if verbose == 2:
+        if verbose:
             print(f"detected {len(cavs)} {'cavity' if len(cavs) == 1 else 'cavities'}")
 
         # PLOT CONTOURS
@@ -452,7 +492,20 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
             ax.contour(cavs.sum(axis=0), colors=["white","yellow"], linewidths=1.3, levels=[th1, th2], zorder=2, norm=Normalize(0,1))
 
         for i, cav in enumerate(cavs):
-            ax.text(*center_of_mass(cav)[::-1], i+1, color="w", ha="center", va="center", fontsize=14) #, weight="bold")
+            center = center_of_mass(cav.T)
+            ha, va = "center", "center"
+            ax.text(*center, i+1, color="w", ha=ha, va=va, fontsize=14, weight="bold")
+
+            angle, e = rotangle_and_ellip(cav.T)
+
+            if plot_arrows:
+                a = (np.sum(cav) / np.pi / (1-e))**0.5
+                b = a * (1-e)
+
+                ax.quiver(center[0], center[1], np.cos(angle)*a, np.sin(angle)*a, 
+                        color='cyan', scale=1, scale_units='xy', angles='xy', zorder=1)
+                ax.quiver(center[0], center[1], -np.sin(angle)*b, np.cos(angle)*b, 
+                        color='cyan', scale=1, scale_units='xy', angles='xy', zorder=1)
 
             ccd = CCDData(cav, unit="adu", wcs=wcs)
             ccd.write(f"{galaxy}/decomposed/{galaxy}_{size}_{i+1}.fits", overwrite=True)
@@ -464,29 +517,29 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
             area_arcsec = area * angular_scale**2
             volume = np.sum(cube)
             volume_arcsec = volume * angular_scale**3
-            volume_from_area = 4 * np.pi / 3 * (area_arcsec / np.pi)**(3/2)
 
             df.loc[(f"{size} pixels", i+1), "area [px²]"] = round(area)
             df.loc[(f"{size} pixels", i+1), "area [arcsec²]"] = round(area_arcsec)
             df.loc[(f"{size} pixels", i+1), "volume [px³]"] = round(volume)
-            df.loc[(f"{size} pixels", i+1), "volume [arcsec³] (rotated)"] = round(volume_arcsec)
-            df.loc[(f"{size} pixels", i+1), "volume [arcsec³] (from area)"] = round(volume_from_area)
+            df.loc[(f"{size} pixels", i+1), "volume [arcsec³]"] = round(volume_arcsec)
+            df.loc[(f"{size} pixels", i+1), "angle [deg]"] = round(np.degrees(angle), 1)
+            df.loc[(f"{size} pixels", i+1), "ellipticity"] = round(e, 2)
 
     # Save & display results
-    if verbose == 2:
+    if verbose:
         print(f"\nSaving results:\n{galaxy}/cavity_properties.txt")
         print("\narea [px²] and volume [px³] are expressed in units of binned pixels")
-        print("volume [arcsec³] (rotated) - calculated assuming rotational symmetry along the axis from galaxy center to cavity center")
-        print("volume [arcsec³] (from area) - calculated from area assuming a sphere V ≈ 0.75 A^(3/2)\n")
+        print("volume [arcsec³] - calculated assuming rotational symmetry along the axis from galaxy center to cavity center")
 
     df.to_csv(f"{galaxy}/cavity_properties.txt", sep=",", float_format="%.2f")
-    if verbose > 0:
-        display(df.T)
+    if verbose:
+        df["area [px²]"] = df["area [px²]"].astype(int)
+        df["area [arcsec²]"] = df["area [arcsec²]"].astype(int)
+        df["volume [px³]"] = df["volume [px³]"].astype(int)
+        df["volume [arcsec³]"] = df["volume [arcsec³]"].astype(int)
+        display(df)
 
     fig.tight_layout()
     fig.savefig(f"{galaxy}/{galaxy}.png", bbox_inches="tight", dpi=250)
     # plt.close(fig)
 
-
-if __name__ == "__main__":
-    configure_GPU()

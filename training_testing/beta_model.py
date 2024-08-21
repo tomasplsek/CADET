@@ -14,21 +14,24 @@ points = device_put(points)
 
 @jit
 def create_rotation_matrix(a, b, c):
+    cos_a, sin_a = cos(a), sin(a)
+    cos_b, sin_b = cos(b), sin(b)
+    cos_c, sin_c = cos(c), sin(c)
+
     rot_x = array([[1, 0, 0],
-                  [0, cos(a), -sin(a)],
-                  [0, sin(a), cos(a)]], dtype=t)
+                  [0, cos_a, -sin_a],
+                  [0, sin_a, cos_a]], dtype=t)
 
-    rot_y = array([[cos(b), 0, sin(b)],
+    rot_y = array([[cos_b, 0, sin_b],
                   [0, 1, 0],
-                  [-sin(b), 0, cos(b)]], dtype=t)
+                  [-sin_b, 0, cos_b]], dtype=t)
 
-    rot_z = array([[cos(c), -sin(c), 0],
-                  [sin(c), cos(c), 0],
+    rot_z = array([[cos_c, -sin_c, 0],
+                  [sin_c, cos_c, 0],
                   [0, 0, 1]], dtype=t)
 
     return dot(rot_z, dot(rot_y, rot_x))
 
-@jit
 def create_ellipsoidal_grid(center, radii, angle):
     rot = create_rotation_matrix(*angle)
 
