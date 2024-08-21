@@ -41,7 +41,7 @@ An exemplary notebook on how to use the `pycadet` package can be found here:
 </a>
 
 
-## DS9 Plugin
+<!---## DS9 Plugin
 
 The CADET pipeline can also be used as a [SAOImageDS9](https://ds9.si.edu/) plugin which is installed together with the `pycadet` Python package. The CADET plugin requires that SAOImageDS9 is already installed on the system. To avoid conflicts (e.g. the CIAO installation of DS9), it is recommended to install `pycadet` using a system installation of Python3 rather than a Conda environment.
 
@@ -49,7 +49,7 @@ After the installation, the CADET plugin should be available in the *Analysis* m
 
 If the CADET plugin does not appear in the *Analysis* menu, it can be added manually by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADET.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans) (after the installation it should be located in `~/.ds9/`). The plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
 
-![DS9 CADET plugin](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif)
+![DS9 CADET plugin](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif) --->
 
 ## Online CADET interface
 
