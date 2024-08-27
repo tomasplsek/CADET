@@ -60,10 +60,10 @@ A simplified version of the CADET pipeline is available via a <a href="https://h
 
 ## Convolutional part
 
-The convolutional part of the pipeline can be used separately to produce raw pixel-wise predictions. Since the convolutional network was implemented using the functional *Keras* API, the architecture could have been stored together with the trained weights in the HDF5 format ([`CADET.hdf5`](https://github.com/tomasplsek/CADET/raw/main/pycadet/CADET.hdf5)). The trained model can then simply be loaded using the `load_model` *TensorFlow* function:
+The convolutional part of the pipeline can be used separately to produce raw pixel-wise predictions. Since the convolutional network was implemented using the functional *Keras* API, the architecture could have been stored together with the trained weights in the HDF5 format ([`CADET.hdf5`](https://github.com/tomasplsek/CADET/raw/main/pycadet/CADET.hdf5)). The trained model can then simply be loaded using the `load_model` *Keras* function (requires *Keras* v2.15 or lower):
 
 ```python
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 
 model = load_model("CADET.hdf5")
 
