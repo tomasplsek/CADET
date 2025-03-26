@@ -1,1 +1,0 @@
-galaxy scale cavity_number area[px^2] area[arcsec^2] volume[arcsec^3]

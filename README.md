@@ -21,18 +21,21 @@ or from source:
 $ pip3 install git+https://github.com/tomasplsek/CADET.git
 ```
 
-The `pycadet` package requires the following libraries (which should be installed automatically with the package):
+The `pycadet` package requires the following libraries:
 ```
-keras<=2.15
-tensorflow
+keras
+tensorflow / pytorch / jax
+scikit-learn>=1.1
 numpy
 scipy
 astropy
 matplotlib
-scikit-learn>=1.1
+pyds9
 ```
 
-For Conda environments, it is recommended to install the dependencies beforehand as some of the packages can be tricky to install in an existing environment (especially `tensorflow`) and on some machines (especially new Macs). For machines with dedicated NVIDIA GPUs, `tensorflow-gpu` can be installed to allow the CADET model to leverage the GPU for faster inference.
+Since `pycadet v0.3.3`, the package is compatible with Keras3, which supports multiple backends (`tensorflow`, `pytorch` or `jax`). By default, the `tensorflow` is used, but any other backend can be selected by setting the `KERAS_BACKEND` environment variable or editing the `~/keras/keras.json` file. 
+
+The automatic installation of `pycadet` will only install the `keras` package, and the installation of the backend is left to the user. For machines with dedicated NVIDIA graphical cards, the `-gpu` versions of backend libraries (`tensorflow-gpu`, `pytorch-gpu`, `jax-gpu`) can be installed to allow the CADET model to leverage the GPU for faster inference. For Anaconda environments, it is recommended to install the dependencies beforehand as some of the packages can be tricky to install in an existing environment and on some machines (e.g. new Macs).
 
 An exemplary notebook on how to use the `pycadet` package can be found here: 
 
@@ -41,15 +44,15 @@ An exemplary notebook on how to use the `pycadet` package can be found here:
 </a>
 
 
-<!---## DS9 Plugin
+## DS9 Plugin
 
-The CADET pipeline can also be used as a [SAOImageDS9](https://ds9.si.edu/) plugin which is installed together with the `pycadet` Python package. The CADET plugin requires that SAOImageDS9 is already installed on the system. To avoid conflicts (e.g. the CIAO installation of DS9), it is recommended to install `pycadet` using a system installation of Python3 rather than a Conda environment.
+The CADET pipeline can also be used as a [SAOImageDS9](https://ds9.si.edu/) plugin which is installed together with the `pycadet` Python package. The CADET plugin requires that SAOImageDS9 is already installed on the system.
 
 After the installation, the CADET plugin should be available in the *Analysis* menu of DS9. After clicking on the *CADET* option, a new window will appear, where the user can set several options: whether the prediction should be averaged over multiple input images by shifting by +/- 1 pixel (*Shift*); and whether the prediction should be decomposed into individual cavities (*Decompose*). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one (*Threshold1*) is used for volume error calibration and the second one (*Threshold2*) for false positive rate calibration (for more info see [Plšek et al. 2023](https://arxiv.org/abs/2304.05457)).
 
-If the CADET plugin does not appear in the *Analysis* menu, it can be added manually by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADET.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans) (after the installation it should be located in `~/.ds9/`). The plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
+If the CADET plugin does not appear in the *Analysis* menu, it can be added manually by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADET.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans) (after the installation it should be located in `~/.ds9/`). This plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
 
-![DS9 CADET plugin](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif) --->
+![DS9 CADET plugin](https://github.com/tomasplsek/CADET/raw/main/docs/figures/DS9CADET.gif)
 
 ## Online CADET interface
 

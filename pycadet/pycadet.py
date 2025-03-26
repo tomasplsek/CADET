@@ -155,7 +155,7 @@ def make_prediction(image, shift=False): #, bootstrap=False, N_bootstrap=10):
     # Load CADET model
     from keras.models import load_model
     path = os.path.dirname(__file__)
-    model = load_model(f'{path}/CADET.hdf5')
+    model = load_model(f'{path}/CADET.hdf5', compile=False, safe_mode=True)
 
     # N_bootstrap = 1 if not bootstrap else N_bootstrap
 
@@ -402,7 +402,7 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     image0 = hdu0[0].data
     wcs0 = WCS(hdu0[0].header)
     if verbose:
-        print(f"\nOriginal image size: {image0.shape[0]}x{image0.shape[1]} pixels")
+        print(f"\nOriginal image size: {image0.shape[0]} x {image0.shape[1]} pixels")
         print(f"Selected scales: {str(scales)}")
 
     # Print RA & DEC, if not specified use the center of the image
@@ -422,8 +422,8 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
     # MAKE DIRECTORIES
     if verbose:
         # print(f"Creating directories {galaxy}:\n{galaxy}/\n  \u251Cpredicitons/ - raw CADET predictions\n  \u251Cdecomposed/ - predictions decomposed into individual cavities\n  \u2514cubes/ - 3D representations of cavities")
-        print(f"\nCreating directories:\n{galaxy}/\n  \u251C predicitons/\n  \u251C decomposed/\n  \u2514 cubes/")
-    os.system(f"mkdir -p {galaxy} {galaxy}/predictions {galaxy}/decomposed {galaxy}/cubes")
+        print(f"\nCreating directories:\n{galaxy}/\n  \u251C cropped/\n  \u251C predicitons/\n  \u251C decomposed/\n  \u2514 cubes/")
+    os.system(f"mkdir -p {galaxy} {galaxy}/predictions {galaxy}/decomposed {galaxy}/cubes {galaxy}/cropped")
 
     # Blank dataframe for saving results
     index = pd.MultiIndex(levels=[[],[]], codes=[[],[]], names=['scale', 'cavity'])
@@ -440,6 +440,8 @@ def CADET(galaxy, scales=[1,2,3,4], ra="", dec="", th1=0.4, th2=0.7, shift=False
             print(f"{size} pixels:", end="  ")
 
         image, wcs = rebin(f"{galaxy}.fits", scale, ra=ra, dec=dec, shift=shift)
+        hdu = fits.PrimaryHDU(image, header=wcs.to_header())
+        hdu.writeto(f"{galaxy}/cropped/{galaxy}_{scale * 128}.fits", overwrite=True)
 
         angular_scale = wcs.pixel_scale_matrix[1,1] * 3600
 
