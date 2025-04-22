@@ -1,9 +1,5 @@
 .ipynb_checkpoints
 __py_cache__
 .vscode
-logs
-mock_data
-CADET_best.hdf5
-CADET_final.hdf5
-dist
-pycadet.egg-info
+NGC4649
+NGC4778
