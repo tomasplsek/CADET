@@ -24,8 +24,8 @@ $ pip3 install git+https://github.com/tomasplsek/CADET.git
 The `pycadet` package requires the following libraries:
 ```
 keras
-tensorflow / pytorch / jax
-scikit-learn>=1.1
+tensorflow / pytorch / jax # depending on which Keras backend you want to use
+scikit-learn
 numpy
 scipy
 astropy
@@ -33,7 +33,7 @@ matplotlib
 pyds9
 ```
 
-Since `pycadet v0.3.3`, the package is compatible with Keras3, which supports multiple backends (`tensorflow`, `pytorch` or `jax`). By default, the `tensorflow` is used, but any other backend can be selected by setting the `KERAS_BACKEND` environment variable or editing the `~/keras/keras.json` file. 
+Since `pycadet v0.3.0`, the package is compatible with Keras3 which supports multiple backends (`tensorflow`, `pytorch` or `jax`). By default, the `tensorflow` is used, but any other backend can be selected by setting the `KERAS_BACKEND` environment variable or editing the `~/keras/keras.json` file. 
 
 The automatic installation of `pycadet` will only install the `keras` package, and the installation of the backend is left to the user. For machines with dedicated NVIDIA graphical cards, the `-gpu` versions of backend libraries (`tensorflow-gpu`, `pytorch-gpu`, `jax-gpu`) can be installed to allow the CADET model to leverage the GPU for faster inference. For Anaconda environments, it is recommended to install the dependencies beforehand as some of the packages can be tricky to install in an existing environment and on some machines (e.g. new Macs).
 

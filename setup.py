@@ -7,12 +7,6 @@ from setuptools.command.install import install
 
 DS9CADET_text = """CADET
 *
-bind c
-DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -th1 $threshold1 -th2 $threshold2  | $text
-#DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
-
-CADET
-*
 menu
 DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -th1 $threshold1 -th2 $threshold2  | $text
 #DS9CADET CADET -x $xpa_method  $param(CADET); -dec $decompose -shift $shift -b $bootstrap -n $boot_n -th1 $threshold1 -th2 $threshold2  | $text
