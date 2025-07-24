@@ -33,7 +33,7 @@ matplotlib
 pyds9
 ```
 
-Since `pycadet v0.3.0`, the package is compatible with Keras3 which supports multiple backends (`tensorflow`, `pytorch` or `jax`). By default, the `tensorflow` is used, but any other backend can be selected by setting the `KERAS_BACKEND` environment variable or editing the `~/keras/keras.json` file. 
+Since `pycadet v0.3.0`, the package is compatible with Keras3 which supports multiple backends (`tensorflow`, `pytorch` or `jax`). By default, the `tensorflow` backend is used, but any other backend can be selected by setting the `KERAS_BACKEND` environment variable or by editing the `~/keras/keras.json` file (note: `pytorch` need to be defined as `torch`).
 
 The automatic installation of `pycadet` will only install the `keras` package, and the installation of the backend is left to the user. For machines with dedicated NVIDIA graphical cards, the `-gpu` versions of backend libraries (`tensorflow-gpu`, `pytorch-gpu`, `jax-gpu`) can be installed to allow the CADET model to leverage the GPU for faster inference. For Anaconda environments, it is recommended to install the dependencies beforehand as some of the packages can be tricky to install in an existing environment and on some machines (e.g. new Macs).
 
@@ -48,7 +48,7 @@ An exemplary notebook on how to use the `pycadet` package can be found here:
 
 The CADET pipeline can also be used as a [SAOImageDS9](https://ds9.si.edu/) plugin which is installed together with the `pycadet` Python package. The CADET plugin requires that SAOImageDS9 is already installed on the system.
 
-After the installation, the CADET plugin should be available in the *Analysis* menu of DS9. After clicking on the *CADET* option, a new window will appear, where the user can set several options: whether the prediction should be averaged over multiple input images by shifting by +/- 1 pixel (*Shift*); and whether the prediction should be decomposed into individual cavities (*Decompose*). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one (*Threshold1*) is used for volume error calibration and the second one (*Threshold2*) for false positive rate calibration (for more info see [Plšek et al. 2023](https://arxiv.org/abs/2304.05457)).
+After the installation, the CADET plugin should be available in the *Analysis* menu of DS9. After clicking on the *CADET* option, a new window will appear, where the user can set several options: whether the prediction should be averaged over multiple input images by shifting by +/- 1 pixel (*Shift*); and whether the prediction should be decomposed into individual cavities (*Decompose*). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one (*Threshold1*) is used for volume calibration and the second one (*Threshold2*) for false positive rate calibration (for more info see [Plšek et al. 2023](https://academic.oup.com/mnras/article/527/2/3315/7339785)).
 
 If the CADET plugin does not appear in the *Analysis* menu, it can be added manually by opening *Edit* > *Preferences* > *Analysis* and adding a path to the following file [DS9CADET.ds9.ans](https://github.com/tomasplsek/CADET/raw/main/pycadet/DS9CADET.ds9.ans) (after the installation it should be located in `~/.ds9/`). This plugin is inspired by the [pyds9plugin](https://github.com/vpicouet/pyds9plugin/tree/master) library.
 
@@ -104,7 +104,7 @@ If you use the CADET  pipeline in your research, please cite the following paper
 
 The following improvements to the data generation and training process are currently planned:
 
-- [ ] add other features (cold fronts, complex sloshing, point sources, jets)
+- [ ] add other features to supress FP rate (cold fronts, complex sloshing, point sources, jets)
 - [ ] use more complex cavity shapes (e.g. [Guo et al. 2015](https://arxiv.org/abs/1408.5018))
 - [ ] train on multiband images simulated using PyXsim/SOXS
 - [ ] replace DBSCAN by using instance segmentation 

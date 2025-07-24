@@ -1,5 +1,8 @@
 .ipynb_checkpoints
 __py_cache__
 .vscode
+mock_data
+dist
+pycadet.egg-info
 NGC4649
 NGC4778

@@ -302,7 +302,7 @@ def rotangle_and_ellip(cavity):
     return angle, e
 
 
-def make_3D_cavity(cavity, rotate_back=False):
+def make_3D_cavity(cavity, rotate_back=False, inclination=0):
     '''
     Assuming rotational symmetry, this function creates a 3D representation of the cavity.
     The 3D cube can be saved as a .npy file and further be used to calculate total cavity energy (E=4pV).
@@ -350,6 +350,11 @@ def make_3D_cavity(cavity, rotate_back=False):
     # ROTATES BACK
     if rotate_back:
         cube = rotate(cube, -phi*180/np.pi, axes=(0,2), reshape=False, prefilter=True)
+        cube = np.where(cube > 0.1, 1, 0)
+        
+    # ROTATES CAVITY TO A SPECIFIED INCLINATION
+    if inclination != 0:
+        cube = rotate(cube, inclination*180/np.pi, axes=(0,1), reshape=False, prefilter=True)
         cube = np.where(cube > 0.1, 1, 0)
 
     return cube
