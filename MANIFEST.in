@@ -1,0 +1,11 @@
+include README.md
+include LICENSE
+include requirements.txt
+include pyproject.toml
+recursive-include pycadet *.hdf5
+recursive-exclude docs *
+recursive-exclude training_testing *
+recursive-exclude examples *
+global-exclude *.py[cod]
+global-exclude __pycache__
+global-exclude *.so

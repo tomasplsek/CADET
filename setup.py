@@ -1,7 +1,5 @@
-import os, sys
-from pathlib import Path
-from subprocess import check_call
-from setuptools import setup, find_packages
+import os
+from setuptools import setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 
@@ -73,61 +71,22 @@ def LoadDS9CADET():
         print("DS9 not found. If you want to use CADET as DS9 plugin, please install DS9 first.")
 
 class PostDevelopCommand(develop):
+    """Post-installation for development mode."""
     def run(self):
-        for package in requirements:
-            pip_install(package)
         develop.run(self)
         LoadDS9CADET()
 
 class PostInstallCommand(install):
+    """Post-installation for installation mode."""
     def run(self):
-        for package in requirements:
-            pip_install(package)
         install.run(self)
         LoadDS9CADET()
 
-def pip_install(package_name):
-    try: check_call([sys.executable, "-m", "pip", "install", package_name])
-    except: pass
-
-requirements = [#"keras <= 2.15",
-                #"tensorflow",
-                "keras",
-                "scikit-learn",
-                "numpy >=1.8",
-                "pandas",
-                "matplotlib", # >= 3.1.1",
-                "astropy >=1.3",
-                "scipy >=0.14",
-                "pyds9",
-                ]
-
-entry_points = {}
-entry_points["console_scripts"] = ["DS9CADET = pycadet.DS9CADET:main"]
-
-data = {"pycadet": ["*.hdf5",]}
-
-this_directory = Path(__file__).parent
-long_description = (this_directory / "README.md").read_text()
-
-MAJOR = "0"
-MINOR = "3"
-MICRO = "2"
-version = "%s.%s.%s" % (MAJOR, MINOR, MICRO)
-
+# Minimal setup.py that only handles custom commands
+# All other configuration is now in pyproject.toml
 setup(
-    name="pycadet",
-    version=version,
-    author="Tomas Plsek",
-    author_email="plsek@physics.muni.cz",
-    description="Cavity Detection Tool",
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    url="https://github.com/tomasplsek/CADET",
-    # install_requires=requirements,
-    entry_points=entry_points,
-    cmdclass={"install": PostInstallCommand, "develop": PostDevelopCommand},
-    packages=find_packages(exclude=("docs", "training_testing", "examples",)),
-    package_data=data,
-    include_package_data=False,
+    cmdclass={
+        "install": PostInstallCommand, 
+        "develop": PostDevelopCommand
+    },
 )

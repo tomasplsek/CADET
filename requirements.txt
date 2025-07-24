@@ -1,0 +1,19 @@
+# Core dependencies for pycadet
+keras
+scikit-learn
+numpy>=1.8
+pandas
+matplotlib
+astropy>=1.3
+scipy>=0.14
+pyds9
+
+# Optional backend dependencies (install one of these)
+# tensorflow  # Default Keras backend
+# torch       # PyTorch backend for Keras
+# jax         # JAX backend for Keras
+
+# For GPU support (optional, install if you have CUDA)
+# tensorflow[and-cuda]  # TensorFlow with CUDA
+# torch[cuda]           # PyTorch with CUDA
+# jax[cuda12]           # JAX with CUDA 12

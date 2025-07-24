@@ -12,13 +12,30 @@ The architecture of the convolutional network consists of 5 convolutional blocks
 The CADET pipeline has been released as a standalone Python3 package [`pycadet`](https://pypi.org/project/pycadet/), which can be installed using pip:
 
 ```console
+# Basic installation (Keras only, backend must be installed separately)
 $ pip3 install pycadet
+
+# Install with TensorFlow backend
+$ pip3 install pycadet[tensorflow]
+
+# Install with PyTorch backend
+$ pip3 install pycadet[pytorch]
+
+# Install with JAX backend
+$ pip3 install pycadet[jax]
+
+# Install with GPU support
+$ pip3 install pycadet[gpu-tensorflow]  # TensorFlow with CUDA
+$ pip3 install pycadet[gpu-pytorch]     # PyTorch with CUDA
+$ pip3 install pycadet[gpu-jax]         # JAX with CUDA
 ```
 
 or from source:
 
 ```console
 $ pip3 install git+https://github.com/tomasplsek/CADET.git
+# Or with backend:
+$ pip3 install "git+https://github.com/tomasplsek/CADET.git[tensorflow]"
 ```
 
 The `pycadet` package requires the following libraries:
@@ -33,9 +50,9 @@ matplotlib
 pyds9
 ```
 
-Since `pycadet v0.3.0`, the package is compatible with Keras3 which supports multiple backends (`tensorflow`, `pytorch` or `jax`). By default, the `tensorflow` backend is used, but any other backend can be selected by setting the `KERAS_BACKEND` environment variable or by editing the `~/keras/keras.json` file (note: `pytorch` need to be defined as `torch`).
+Since `pycadet v0.3.0`, the package is compatible with Keras3 which supports multiple backends (`tensorflow`, `pytorch` or `jax`). **Starting from version 0.3.3**, you can now specify the backend during installation using the optional dependency groups shown above.
 
-The automatic installation of `pycadet` will only install the `keras` package, and the installation of the backend is left to the user. For machines with dedicated NVIDIA graphical cards, the `-gpu` versions of backend libraries (`tensorflow-gpu`, `pytorch-gpu`, `jax-gpu`) can be installed to allow the CADET model to leverage the GPU for faster inference. For Anaconda environments, it is recommended to install the dependencies beforehand as some of the packages can be tricky to install in an existing environment and on some machines (e.g. new Macs).
+If you install without specifying a backend (`pip install pycadet`), only the `keras` package will be installed and you'll need to install a backend separately. The active backend can also be selected by setting the `KERAS_BACKEND` environment variable or by editing the `~/keras/keras.json` file (note: `pytorch` needs to be defined as `torch`).
 
 An exemplary notebook on how to use the `pycadet` package can be found here: 
 
