@@ -28,11 +28,8 @@ $ pip3 install pycadet[jax]
 $ pip3 install pycadet[gpu-tensorflow]  # TensorFlow with CUDA
 $ pip3 install pycadet[gpu-pytorch]     # PyTorch with CUDA
 $ pip3 install pycadet[gpu-jax]         # JAX with CUDA
-```
 
-or from source:
-
-```console
+# For source installation (without backend)
 $ pip3 install git+https://github.com/tomasplsek/CADET.git
 ```
 
