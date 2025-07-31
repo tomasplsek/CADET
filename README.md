@@ -34,8 +34,6 @@ or from source:
 
 ```console
 $ pip3 install git+https://github.com/tomasplsek/CADET.git
-# Or with backend:
-$ pip3 install "git+https://github.com/tomasplsek/CADET.git[tensorflow]"
 ```
 
 The `pycadet` package requires the following libraries:
