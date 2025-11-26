@@ -15,20 +15,6 @@ The CADET pipeline has been released as a standalone Python3 package [`pycadet`]
 # Basic installation (Keras only, backend must be installed separately)
 $ pip3 install pycadet
 
-# Install with TensorFlow backend
-$ pip3 install pycadet[tensorflow]
-
-# Install with PyTorch backend
-$ pip3 install pycadet[pytorch]
-
-# Install with JAX backend
-$ pip3 install pycadet[jax]
-
-# Install with GPU support
-$ pip3 install pycadet[gpu-tensorflow]  # TensorFlow with CUDA
-$ pip3 install pycadet[gpu-pytorch]     # PyTorch with CUDA
-$ pip3 install pycadet[gpu-jax]         # JAX with CUDA
-
 # For source installation (without backend)
 $ pip3 install git+https://github.com/tomasplsek/CADET.git
 ```
