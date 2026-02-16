@@ -2,7 +2,7 @@
 
 [CADET](https://tomasplsek.github.io/CADET/) is a machine learning pipeline trained to identify surface brightness depressions (*X-ray cavities*) in noisy *Chandra* images of early-type galaxies and galaxy clusters. The pipeline consists of a convolutional neural network trained to produce pixel-wise cavity predictions and a DBSCAN clustering algorithm that decomposes the predictions into individual cavities. The pipeline is described in detail in [Plšek et al. 2023](https://academic.oup.com/mnras/article/527/2/3315/7339785).
 
-The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an Inception layer, it was implemented using the *Keras* library and its development was inspired by [Fort et al. 2017](https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract) and [Secká 2019](https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411). For the clustering, we used is the *Scikit-learn* implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN).
+The architecture of the convolutional network consists of 5 convolutional blocks, each resembling an Inception layer. It was implemented using the *Keras* library and its development was inspired by [Fort et al. 2017](https://ui.adsabs.harvard.edu/abs/2017arXiv171200523F/abstract) and [Secká 2019](https://is.muni.cz/th/rnxoz/?lang=en;fakulta=1411). For the clustering, we used the *Scikit-learn* implementation of the Density-Based Spatial Clustering of Applications with Noise (DBSCAN).
 
 ![Architecture](https://github.com/tomasplsek/CADET/raw/main/docs/figures/architecture.png)
 
@@ -31,9 +31,9 @@ matplotlib
 pyds9
 ```
 
-Since `pycadet v0.3.0`, the package is compatible with Keras3 which supports multiple backends (`tensorflow`, `pytorch` or `jax`). **Starting from version 0.3.3**, you can now specify the backend during installation using the optional dependency groups shown above.
+Since `pycadet v0.3.3`, the package is compatible with Keras3, which supports multiple backends (`tensorflow`, `pytorch` or `jax`).
 
-If you install without specifying a backend (`pip install pycadet`), only the `keras` package will be installed and you'll need to install a backend separately. The active backend can also be selected by setting the `KERAS_BACKEND` environment variable or by editing the `~/keras/keras.json` file (note: `pytorch` needs to be defined as `torch`).
+If you install without specifying a backend (`pip install pycadet`), only the `keras` package will be installed, and you'll need to install a backend separately. The active backend can also be selected by setting the `KERAS_BACKEND` environment variable or by editing the `~/keras/keras.json` file (note: `pytorch` needs to be defined as `torch`).
 
 An exemplary notebook on how to use the `pycadet` package can be found here: 
 
