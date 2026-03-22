@@ -1,0 +1,2 @@
+[console_scripts]
+DS9CADET = pycadetds9.ds9cadet:main

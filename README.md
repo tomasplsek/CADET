@@ -28,10 +28,9 @@ numpy
 scipy
 astropy
 matplotlib
-pyds9
 ```
 
-Since `pycadet v0.3.3`, the package is compatible with Keras3, which supports multiple backends (`tensorflow`, `pytorch` or `jax`).
+Since `pycadet v0.3.5`, the package is compatible with Keras3, which supports multiple backends (`tensorflow`, `pytorch` or `jax`).
 
 If you install without specifying a backend (`pip install pycadet`), only the `keras` package will be installed, and you'll need to install a backend separately. The active backend can also be selected by setting the `KERAS_BACKEND` environment variable or by editing the `~/keras/keras.json` file (note: `pytorch` needs to be defined as `torch`).
 
@@ -44,7 +43,13 @@ An exemplary notebook on how to use the `pycadet` package can be found here:
 
 ## DS9 Plugin
 
-The CADET pipeline can also be used as a [SAOImageDS9](https://ds9.si.edu/) plugin which is installed together with the `pycadet` Python package. The CADET plugin requires that SAOImageDS9 is already installed on the system.
+The CADET pipeline can also be used as a [SAOImageDS9](https://ds9.si.edu/) plugin, now distributed as a separate package: `pycadetds9`. The DS9 plugin requires that SAOImageDS9 is already installed on the system.
+
+Install with:
+
+```console
+$ pip3 install pycadetds9
+```
 
 After the installation, the CADET plugin should be available in the *Analysis* menu of DS9. After clicking on the *CADET* option, a new window will appear, where the user can set several options: whether the prediction should be averaged over multiple input images by shifting by +/- 1 pixel (*Shift*); and whether the prediction should be decomposed into individual cavities (*Decompose*). When decomposing into individual cavities, the user can also set a pair of discrimination thresholds, where the first one (*Threshold1*) is used for volume calibration and the second one (*Threshold2*) for false positive rate calibration (for more info see [Plšek et al. 2023](https://academic.oup.com/mnras/article/527/2/3315/7339785)).
 

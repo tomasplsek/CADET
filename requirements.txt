@@ -6,12 +6,14 @@ pandas
 matplotlib
 astropy>=1.3
 scipy>=0.14
-pyds9
 
 # Optional backend dependencies (install one of these)
 # tensorflow  # Default Keras backend
 # torch       # PyTorch backend for Keras
 # jax         # JAX backend for Keras
+
+# Optional DS9 integration
+# pycadetds9  # Includes DS9 plugin integration and pyds9 dependency
 
 # For GPU support (optional, install if you have CUDA)
 # tensorflow[and-cuda]  # TensorFlow with CUDA

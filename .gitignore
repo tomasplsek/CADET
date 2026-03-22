@@ -1,5 +1,6 @@
 .ipynb_checkpoints
 __py_cache__
+*/__pycache__/
 .vscode
 mock_data
 dist

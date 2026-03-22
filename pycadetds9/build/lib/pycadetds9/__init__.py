@@ -1,8 +1,6 @@
 from importlib.metadata import version, PackageNotFoundError
 
 try:
-    __version__ = version("pycadet")
+    __version__ = version("pycadetds9")
 except PackageNotFoundError:
     __version__ = "unknown"
-
-from .pycadet import * 

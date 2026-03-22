@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: pycadetds9
+Version: 0.1.0
+Summary: DS9 plugin and CLI integration for pycadet
+Author-email: Tomas Plsek <plsek@physics.muni.cz>
+License: MIT
+Project-URL: Homepage, https://github.com/tomasplsek/CADET
+Project-URL: Repository, https://github.com/tomasplsek/CADET
+Requires-Python: >=3.8
+Requires-Dist: pycadet
+Requires-Dist: pyds9
+Requires-Dist: numpy>=1.8
+Requires-Dist: astropy>=1.3
+Requires-Dist: scipy>=0.14
+Requires-Dist: scikit-learn
